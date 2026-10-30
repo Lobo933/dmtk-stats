@@ -84,6 +84,9 @@ tr.top3 td{background:#fff8e1;font-weight:600}
         <tbody id="playerBody"></tbody>
       </table>
     </div>
+    <p class="footnote" id="fnPlayers" style="margin-top:10px"></p>
+    <p class="warn"   id="fnPM"></p>
+    <p class="footnote" id="fnAbbrev" style="margin-top:6px;border-top:1px solid #eee;padding-top:6px"></p>
     <details id="advDetails" style="margin-top:12px">
       <summary id="advSummary" style="cursor:pointer;font-size:0.8rem;font-weight:700;color:#0A1F5C;padding:6px 0;user-select:none" data-i18n="adv_title">Haladó statisztikák</summary>
       <div class="table-scroll" style="margin-top:8px">
@@ -94,9 +97,6 @@ tr.top3 td{background:#fff8e1;font-weight:600}
       </div>
       <p class="footnote" id="fnAbbrevAdv" style="margin-top:6px;border-top:1px solid #eee;padding-top:6px"></p>
     </details>
-    <p class="footnote" id="fnPlayers" style="margin-top:10px"></p>
-    <p class="warn"   id="fnPM"></p>
-    <p class="footnote" id="fnAbbrev" style="margin-top:6px;border-top:1px solid #eee;padding-top:6px"></p>
   </div>
 
   <div class="section">
@@ -131,7 +131,7 @@ const PLAYER_ROWS= [{"jersey": "8", "display": "Sára", "top3": true, "cells": [
 const GAME_ROWS  = [{"result": "L", "cells": ["1", "10-18", "Parthus", "52–69", "V", "33.3%", "27.8%", "47.4%", "7", "17", "28"], "win": false}, {"result": "L", "cells": ["2", "10-21", "VESC", "57–87", "V", "33.3%", "6.2%", "43.2%", "10", "29", "49"], "win": false}];
 const SCHEDULE   = [{"date": "2026-11-07", "time": "12:00", "home": "DMTK", "away": "OSE Lions U18L", "venue": ""}, {"date": "2026-11-21", "time": "10:00", "home": "DMTK", "away": "Parthus SE", "venue": ""}, {"date": "2026-11-24", "time": "18:00", "home": "DMTK", "away": "VESC", "venue": ""}];
 const N_GAMES    = 2;
-const GENERATED  = "2026-10-30 20:59";
+const GENERATED  = "2026-10-30 21:07";
 
 // ── i18n ─────────────────────────────────────────────────────────────────────
 const T = {
