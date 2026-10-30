@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DMTK U16 — 2026–27</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#f0f4f8;color:#1a1a2e;font-size:14px}
+header{background:#0A1F5C;color:white;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+header h1{font-size:1.15rem;font-weight:700;line-height:1.2}
+header .season{color:#F5C400;font-size:0.8rem;margin-top:3px}
+#langBtn{background:#F5C400;color:#0A1F5C;border:none;border-radius:6px;padding:8px 14px;font-size:0.85rem;font-weight:700;cursor:pointer;white-space:nowrap;min-height:44px}
+.container{max-width:1100px;margin:0 auto;padding:12px}
+.stats-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.stat-box{background:white;border-radius:10px;padding:10px 12px;flex:1;min-width:90px;text-align:center;box-shadow:0 2px 6px rgba(0,0,0,0.08);border-top:3px solid #0A1F5C}
+.stat-val{font-size:1.5rem;font-weight:700;color:#0A1F5C;line-height:1}
+.stat-val.big{font-size:2rem}
+.stat-lbl{font-size:0.65rem;color:#888;text-transform:uppercase;letter-spacing:0.04em;margin-top:4px}
+.section{background:white;border-radius:10px;padding:14px 16px;margin-bottom:16px;box-shadow:0 2px 6px rgba(0,0,0,0.08)}
+.section h2{font-size:0.85rem;font-weight:700;color:#0A1F5C;border-bottom:2px solid #F5C400;padding-bottom:5px;margin-bottom:12px;text-transform:uppercase;letter-spacing:0.05em}
+.table-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{width:100%;border-collapse:collapse;font-size:0.78rem}
+th{background:#0A1F5C;color:white;padding:0 5px;text-align:center;font-size:0.7rem;white-space:nowrap}
+th.sortable{cursor:pointer;user-select:none;min-height:44px;height:44px;line-height:1.1;vertical-align:middle}
+th.sortable:hover{background:#1a3a8c}
+th.sort-asc::after{content:' ▲';font-size:0.6rem}
+th.sort-desc::after{content:' ▼';font-size:0.6rem}
+td{padding:5px 5px;text-align:center;border-bottom:1px solid #eee;white-space:nowrap}
+td:nth-child(2){text-align:left;min-width:80px}
+td:nth-child(3){text-align:left}
+th:nth-child(1),td:nth-child(1){position:sticky;left:0;z-index:2;background:inherit;min-width:28px}
+th:nth-child(2),td:nth-child(2){position:sticky;left:28px;z-index:2;background:inherit;min-width:80px}
+tr:hover td{background:#f0f4ff!important}
+tr.win td{background:#e8f5e9}
+tr.loss td{background:#ffeaea}
+tr.top3 td{background:#fff8e1;font-weight:600}
+.leaders{display:flex;gap:8px;flex-wrap:wrap}
+.leader-card{background:#f0f4ff;border-radius:8px;padding:10px 12px;flex:1;min-width:120px;border-left:3px solid #0A1F5C}
+.leader-cat{font-size:0.65rem;color:#888;text-transform:uppercase;letter-spacing:0.04em}
+.leader-name{font-size:0.95rem;font-weight:700;color:#0A1F5C;margin:3px 0}
+.leader-val{font-size:0.85rem;color:#F5C400;background:#0A1F5C;display:inline-block;padding:2px 7px;border-radius:4px}
+.chart-wrap{position:relative;height:200px}
+.footnote{font-size:0.68rem;color:#888;margin-top:8px;line-height:1.5}
+.footnote b{color:#555}
+.warn{font-size:0.68rem;color:#b22222;margin-top:4px;line-height:1.5}
+.updated{font-size:0.65rem;color:#aaa;text-align:right;margin-top:6px}
+@media(max-width:480px){
+  .stat-box{min-width:80px;padding:8px}
+  .stat-val{font-size:1.2rem}
+  .stat-val.big{font-size:1.6rem}
+  .leader-card{min-width:100px}
+}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>DMTK U16</h1>
+    <div class="season">2026–27</div>
+  </div>
+  <button id="langBtn" onclick="toggleLang()">EN</button>
+</header>
+<div class="container">
+
+  <div class="stats-row" id="heroRow" style="margin-top:12px"></div>
+
+  <div class="section">
+    <h2 data-i18n="chart_title">Pontok meccsenként</h2>
+    <div class="chart-wrap"><canvas id="scoreChart"></canvas></div>
+  </div>
+
+  <div class="section">
+    <h2 data-i18n="leaders_title">Kategóriavezetők</h2>
+    <div class="leaders" id="leadersRow"></div>
+  </div>
+
+  <div class="section">
+    <h2 data-i18n="players_title">Játékosok</h2>
+    <div class="table-scroll">
+      <table id="playerTable">
+        <thead><tr id="playerHead"></tr></thead>
+        <tbody id="playerBody"></tbody>
+      </table>
+    </div>
+    <details id="advDetails" style="margin-top:12px">
+      <summary id="advSummary" style="cursor:pointer;font-size:0.8rem;font-weight:700;color:#0A1F5C;padding:6px 0;user-select:none" data-i18n="adv_title">Haladó statisztikák</summary>
+      <div class="table-scroll" style="margin-top:8px">
+        <table id="playerAdvTable">
+          <thead><tr id="playerAdvHead"></tr></thead>
+          <tbody id="playerAdvBody"></tbody>
+        </table>
+      </div>
+      <p class="footnote" id="fnAbbrevAdv" style="margin-top:6px;border-top:1px solid #eee;padding-top:6px"></p>
+    </details>
+    <p class="footnote" id="fnPlayers" style="margin-top:10px"></p>
+    <p class="warn"   id="fnPM"></p>
+    <p class="footnote" id="fnAbbrev" style="margin-top:6px;border-top:1px solid #eee;padding-top:6px"></p>
+  </div>
+
+  <div class="section">
+    <h2 data-i18n="games_title">Meccsnaplő</h2>
+    <div class="table-scroll">
+      <table id="gameTable">
+        <thead><tr id="gameHead"></tr></thead>
+        <tbody id="gameBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2 data-i18n="schedule_title">Következő mérkőzések</h2>
+    <div class="table-scroll">
+      <table id="scheduleTable">
+        <thead><tr id="scheduleHead"></tr></thead>
+        <tbody id="scheduleBody"></tbody>
+      </table>
+    </div>
+    <p class="footnote" style="margin-top:6px" id="scheduleSrc"></p>
+  </div>
+
+  <div class="updated" id="generated"></div>
+</div>
+
+<script>
+// ── Data ─────────────────────────────────────────────────────────────────────
+const HERO       = {"record": "2–2", "games": "4", "pts_for": "54.5", "pts_ag": "64.5", "margin": "-10.0", "streak": "1L", "fg": "43.9%", "efg": "46.2%", "poss_g": "81.4", "ortg": "67.0"};
+const LEADERS    = [{"hu": "Pont", "en": "Points", "name": "Fanni", "val": "13.2"}, {"hu": "Lepattanó", "en": "Rebounds", "name": "Fanni", "val": "17.0"}, {"hu": "Gólpassz", "en": "Assists", "name": "R. Míra", "val": "2.5"}, {"hu": "Labdaszerzés", "en": "Steals", "name": "Fanni", "val": "4.2"}, {"hu": "PIR átl.", "en": "PIR avg", "name": "Fanni", "val": "25.2"}];
+const PLAYER_ROWS= [{"jersey": "23", "display": "Fanni", "top3": true, "cells": ["23", "Fanni", "4", "32.5", "-10", "-2.5", "101", "25.2", "13.2", "17.0", "1.5", "4.2", "1.8", "4.8", "53.7%", "0.0%"], "adv": ["23", "Fanni", "16.3", "0.3", "1.29", "22.4%", "72.8", "53.7%", "49.3%"]}, {"jersey": "77", "display": "Zselyke", "top3": true, "cells": ["77", "Zselyke", "4", "32.9", "-7", "-1.8", "37", "9.2", "13.0", "5.0", "1.5", "1.5", "0.2", "5.0", "44.4%", "66.7%"], "adv": ["77", "Zselyke", "15.8", "0.3", "1.16", "21.6%", "74.0", "48.9%", "51.7%"]}, {"jersey": "12", "display": "R. Míra", "top3": true, "cells": ["12", "R. Míra", "4", "33.1", "-19", "-4.8", "28", "7.0", "7.5", "6.8", "2.5", "2.5", "1.0", "6.2", "50.0%", "0.0%"], "adv": ["12", "R. Míra", "9.1", "0.4", "1.15", "17.6%", "52.5", "50.0%", "46.6%"]}, {"jersey": "19", "display": "Nikol", "top3": false, "cells": ["19", "Nikol", "4", "32.2", "-10", "-2.5", "24", "6.0", "9.0", "4.2", "0.8", "2.0", "0.2", "4.5", "36.1%", "41.7%"], "adv": ["19", "Nikol", "11.2", "0.2", "1.00", "17.5%", "63.1", "43.1%", "46.1%"]}, {"jersey": "40", "display": "Kitti", "top3": false, "cells": ["40", "Kitti", "3", "11.0", "-41", "-13.7", "14", "4.7", "3.7", "2.3", "0.0", "1.0", "0.7", "1.0", "50.0%", "—"], "adv": ["40", "Kitti", "13.4", "0.0", "1.38", "4.5%", "75.8", "50.0%", "47.7%"]}, {"jersey": "2", "display": "Viki", "top3": false, "cells": ["2", "Viki", "4", "22.6", "+5", "+1.2", "11", "2.8", "1.8", "4.0", "1.5", "1.8", "0.2", "4.5", "30.0%", "0.0%"], "adv": ["2", "Viki", "3.1", "0.3", "0.70", "9.1%", "23.5", "30.0%", "29.8%"]}, {"jersey": "91", "display": "K. Nóri", "top3": false, "cells": ["91", "K. Nóri", "1", "3.5", "-10", "-10.0", "1", "1.0", "0.0", "1.0", "0.0", "0.0", "0.0", "0.0", "—", "—"], "adv": ["91", "K. Nóri", "0.0", "—", "—", "0.0%", "—", "—", "—"]}, {"jersey": "27", "display": "Eszti", "top3": false, "cells": ["27", "Eszti", "4", "11.3", "-52", "-13.0", "1", "0.2", "3.8", "0.5", "0.2", "0.0", "0.0", "2.0", "46.2%", "—"], "adv": ["27", "Eszti", "13.3", "0.1", "1.15", "7.1%", "64.7", "46.2%", "49.3%"]}, {"jersey": "28", "display": "Miri", "top3": false, "cells": ["28", "Miri", "1", "1.6", "-2", "-1.0", "0", "0.0", "0.0", "0.0", "0.0", "0.0", "0.0", "0.0", "—", "—"], "adv": ["28", "Miri", "0.0", "—", "—", "0.0%", "—", "—", "—"]}, {"jersey": "32", "display": "Petra", "top3": false, "cells": ["32", "Petra", "1", "1.4", "+2", "+2.0", "0", "0.0", "0.0", "0.0", "0.0", "0.0", "0.0", "0.0", "—", "—"], "adv": ["32", "Petra", "0.0", "—", "—", "0.0%", "—", "—", "—"]}, {"jersey": "30", "display": "Enikő", "top3": false, "cells": ["30", "Enikő", "3", "4.0", "-4", "-1.3", "-2", "-0.7", "0.0", "0.3", "0.0", "0.0", "0.0", "1.0", "—", "—"], "adv": ["30", "Enikő", "0.0", "0.0", "—", "0.9%", "0.0", "—", "—"]}, {"jersey": "4", "display": "Sára", "top3": false, "cells": ["4", "Sára", "4", "10.1", "-37", "-9.2", "-4", "-1.0", "2.5", "0.5", "0.2", "0.5", "0.8", "2.2", "44.4%", "—"], "adv": ["4", "Sára", "9.9", "0.1", "1.11", "6.2%", "49.5", "44.4%", "44.6%"]}, {"jersey": "10", "display": "Karina", "top3": false, "cells": ["10", "Karina", "1", "5.1", "+2", "+2.0", "-1", "-1.0", "0.0", "1.0", "0.0", "0.0", "0.0", "1.0", "—", "—"], "adv": ["10", "Karina", "0.0", "0.0", "—", "0.3%", "0.0", "—", "—"]}, {"jersey": "21", "display": "Emma", "top3": false, "cells": ["21", "Emma", "2", "4.8", "-23", "-11.5", "-4", "-2.0", "0.5", "0.0", "0.0", "0.0", "0.0", "1.0", "—", "—"], "adv": ["21", "Emma", "4.2", "0.0", "—", "1.4%", "21.6", "—", "18.9%"]}, {"jersey": "20", "display": "Nadin", "top3": false, "cells": ["20", "Nadin", "2", "17.7", "-4", "-2.0", "-18", "-9.0", "1.5", "0.5", "0.5", "1.0", "0.5", "7.0", "12.5%", "0.0%"], "adv": ["20", "Nadin", "3.4", "0.1", "0.38", "7.0%", "13.1", "12.5%", "16.9%"]}];
+const GAME_ROWS  = [{"result": "W", "cells": ["1", "09-12", "CEKK", "69–50", "GY", "52.5%", "50.0%", "33.3%", "14", "25", "40"], "win": true}, {"result": "L", "cells": ["2", "09-12", "Szolnoki sportcentrum", "51–99", "V", "53.3%", "50.0%", "37.0%", "6", "39", "39"], "win": false}, {"result": "W", "cells": ["3", "10-06", "KS Szeged", "48–39", "GY", "33.3%", "42.9%", "47.4%", "9", "35", "44"], "win": true}, {"result": "L", "cells": ["4", "10-20", "Kiss Lenke/B", "50–70", "V", "39.6%", "20.0%", "46.7%", "5", "41", "40"], "win": false}];
+const SCHEDULE   = [{"date": "2026-11-08", "time": "12:00", "home": "DMTK", "away": "Mezőberényi KK", "venue": "Kőrösi Csoma Sándor Ált. Isk. Tornaterme"}, {"date": "2026-11-10", "time": "18:00", "home": "DMTK", "away": "FSE Fóti Tigrisek/A", "venue": "Kőrösi Csoma Sándor Ált. Isk. Tornaterme"}, {"date": "2026-11-14", "time": "11:00", "home": "BKG-Veresegyház", "away": "DMTK", "venue": "Veresegyházi Kosárlabda Csarnok"}, {"date": "2026-11-21", "time": "11:00", "home": "KS Szeged U16", "away": "DMTK", "venue": "Városi Sportcsarnok"}, {"date": "2026-11-28", "time": "11:00", "home": "DMTK", "away": "Kiss Lenke KS/B", "venue": "Kőrösi Csoma Sándor Ált. Isk. Tornaterme"}, {"date": "2026-12-05", "time": "11:00", "home": "FSE Fóti Tigrisek/A", "away": "DMTK", "venue": "Bajza József Ált. Isk. Tornacsarnoka"}, {"date": "2026-12-11", "time": "15:30", "home": "Mezőberényi KK", "away": "DMTK", "venue": "Molnár Miklós Sportcsarnok"}, {"date": "2026-12-15", "time": "18:00", "home": "DMTK", "away": "BKG-Veresegyház", "venue": "Kőrösi Csoma Sándor Ált. Isk. Tornaterme"}];
+const N_GAMES    = 4;
+const GENERATED  = "2026-10-30 20:11";
+
+// ── i18n ─────────────────────────────────────────────────────────────────────
+const T = {
+  hu: {
+    lang_toggle:   "EN",
+    chart_title:   "Pontok meccsenként",
+    leaders_title: "Kategóriavezetők",
+    players_title: "Játékosok — PIR szerint rendezve (oszlopra kattintva átrendezhető)",
+    games_title:   "Meccsnaplő — oszlopra kattintva rendezhető",
+    record:   "Mérleg",
+    games:    "Meccsek",
+    pts_for:  "Átlag pont (saját)",
+    pts_ag:   "Átlag pont (ellen)",
+    margin:   "Átlag különbség",
+    streak:   "Jelenlegi sorozat",
+    fg:       "MK%",
+    efg:      "eMK%",
+    poss_g:   "Bir./meccs",
+    ortg:     "ORtg",
+    wl:       ["GY","V"],
+    player_cols: ["#","Játékos","MJ","P/m","+/- össz","+/- átl","PIR össz","PIR átl","PPG","RPG","APG","SPG","BPG","TO","MK%","3P%"],
+    player_cols_adv: ["#","Játékos","P40","AST/TO","PPS","Haszn%*","ORtg*","eMK%","TS%"],
+    adv_title: "Haladó statisztikák",
+    game_cols:   ["#","Dátum","Ellenfél","Eredmény","GY/V","FG%","3P%","FT%","Gólp.","TO","Lep."],
+    fn_pir: "A táblázat <b>PIR</b> (Performance Index Rating) szerint van rendezve — ez az európai kosárlabda hivatalos összesített teljesítménymutatója. Minden pozitív dolog hozzáadódik (pont, lepattanó, gólpassz, labdaszerzés, blokk), minden negatív levonódik (elveszített labda, rontott kísérlet, büntetőhiba). Minél magasabb, annál többet adott hozzá a játékos a meccshez.",
+    fn_pm: "<b>+/- figyelembe vételénél légy óvatos!</b> 4 meccses mintán ez a mutató torzíthat — aki sérülés vagy pihentetés miatt lemaradt egy lefutott meccsről, erős pozitív +/- értéket kaphat anélkül, hogy bármit is tett volna.",
+    generated: "Generálva:",
+    dmtk_label: "DMTK",
+    opp_label: "Ellenfél",
+    abbrev_legend: "Rövidítések: MJ = mérkőzés játszott · P/m = perc/meccs · PPG = pont/meccs · RPG = lepattanó/meccs · APG = gólpassz/meccs · SPG = labdaszerzés/meccs · BPG = blokk/meccs · TO = labdavesztés/meccs · MK% = mezőnykosár% · 3P% = hárompontos%",
+    abbrev_legend_adv: "Haladó mutatók: P40 = pont/40 perc · AST/TO = gólpassz–labdavesztés arány · PPS = pont/mezőnykísérlet · eMK% = hatékony mezőnykosár% (a hármasokat 1,5-ös súllyal számolja) · TS% = valódi dobási% — pont / (2 × (mezőnykísérlet + 0,44 × büntető)) · Haszn%* = a csapat támadó lehetőségeiből felhasznált arány · ORtg* = közelítő egyéni offenzív hatékonyság (pont / 100 egyéni lehetőség) · * = közelítő mutató",
+    schedule_title: "Következő mérkőzések",
+    schedule_cols: ["Dátum","Idő","Hazai","Vendég","Helyszín"],
+    schedule_home: "H",
+    schedule_away: "V",
+    schedule_src: "Forrás: mkosz.hu · frissítve: 2026-10-30",
+  },
+  en: {
+    lang_toggle:   "HU",
+    chart_title:   "Points Per Game",
+    leaders_title: "Category Leaders",
+    players_title: "Player Stats — sorted by PIR (click column to re-sort)",
+    games_title:   "Game Log — click column to sort",
+    record:   "Record",
+    games:    "Games",
+    pts_for:  "Avg Pts For",
+    pts_ag:   "Avg Pts Against",
+    margin:   "Avg Margin",
+    streak:   "Current Streak",
+    fg:       "FG%",
+    efg:      "eFG%",
+    poss_g:   "Poss/G",
+    ortg:     "ORtg",
+    wl:       ["W","L"],
+    player_cols: ["#","Player","GP","MPG","+/- tot","+/- avg","PIR tot","PIR avg","PPG","RPG","APG","SPG","BPG","TO","FG%","3P%"],
+    player_cols_adv: ["#","Player","P40","AST/TO","PPS","Usg%*","ORtg*","eFG%","TS%"],
+    adv_title: "Advanced Stats",
+    game_cols:   ["#","Date","Opponent","Score","W/L","FG%","3P%","FT%","AST","TO","REB"],
+    fn_pir: "The table is sorted by <b>PIR</b> (Performance Index Rating) — European basketball's official all-round performance stat. Everything positive adds up (points, rebounds, assists, steals, blocks) and everything negative is subtracted (turnovers, missed shots, fouls). The higher the number, the more the player contributed to the game.",
+    fn_pm: "<b>Read +/- with caution.</b> Over a 4-game sample it is noisy and heavily skewed by who was on court during a blowout — a player who sat out a bad loss can show a strong +/- without doing anything.",
+    generated: "Generated:",
+    dmtk_label: "DMTK",
+    opp_label: "Opponent",
+    abbrev_legend: "Abbreviations: GP = games played · MPG = minutes per game · PPG = points per game · RPG = rebounds per game · APG = assists per game · SPG = steals per game · BPG = blocks per game · TO = turnovers per game · FG% = field goal % · 3P% = three-point %",
+    abbrev_legend_adv: "Advanced stats: P40 = points per 40 min · AST/TO = assist-to-turnover ratio · PPS = points per field-goal attempt · eFG% = effective FG% (weights 3-pointers at 1.5×) · TS% = true shooting % — pts ÷ (2 × (FGA + 0.44 × FTA)) · Usg%* = share of team possessions used · ORtg* = approx. individual offensive rating (pts per 100 possessions) · * = approximation",
+    schedule_title: "Upcoming Games",
+    schedule_cols: ["Date","Time","Home","Away","Venue"],
+    schedule_home: "H",
+    schedule_away: "A",
+    schedule_src: "Source: mkosz.hu · updated: 2026-10-30",
+  }
+};
+
+// ── State ─────────────────────────────────────────────────────────────────────
+let lang = localStorage.getItem('dmtk_lang') || 'hu';
+let chartInstance = null;
+let playerSortCol = -1, playerSortAsc = true;
+let playerAdvSortCol = -1, playerAdvSortAsc = true;
+let gameSortCol   = -1, gameSortAsc   = true;
+
+// ── Render helpers ────────────────────────────────────────────────────────────
+function renderHero() {
+  const t = T[lang];
+  const keys = ['record','games','pts_for','pts_ag','margin','streak','fg','efg','poss_g','ortg'];
+  const vals = [HERO.record,HERO.games,HERO.pts_for,HERO.pts_ag,HERO.margin,HERO.streak,HERO.fg,HERO.efg,HERO.poss_g,HERO.ortg];
+  document.getElementById('heroRow').innerHTML = keys.map((k,i) =>
+    `<div class="stat-box"><div class="stat-val${k==='record'?' big':''}">${vals[i]}</div><div class="stat-lbl">${t[k]}</div></div>`
+  ).join('');
+}
+
+function renderLeaders() {
+  const t = T[lang];
+  document.getElementById('leadersRow').innerHTML = LEADERS.map(l =>
+    `<div class="leader-card"><div class="leader-cat">${lang==='hu'?l.hu:l.en}</div><div class="leader-name">${l.name}</div><div class="leader-val">${l.val}</div></div>`
+  ).join('') || "<p style='color:#aaa'>—</p>";
+}
+
+function renderPlayerTable() {
+  const t = T[lang];
+  const cols = t.player_cols;
+  document.getElementById('playerHead').innerHTML = cols.map((c,i) =>
+    `<th class="sortable" onclick="sortTable('player',${i})">${c}</th>`
+  ).join('');
+  document.getElementById('playerBody').innerHTML = PLAYER_ROWS.map(r => {
+    const cls = r.top3 ? 'top3' : '';
+    return `<tr class="${cls}">${r.cells.map(c=>`<td>${c}</td>`).join('')}</tr>`;
+  }).join('');
+  // Advanced table
+  const acols = t.player_cols_adv;
+  document.getElementById('playerAdvHead').innerHTML = acols.map((c,i) =>
+    `<th class="sortable" onclick="sortTable('playerAdv',${i})">${c}</th>`
+  ).join('');
+  document.getElementById('playerAdvBody').innerHTML = PLAYER_ROWS.map(r => {
+    const cls = r.top3 ? 'top3' : '';
+    return `<tr class="${cls}">${r.adv.map(c=>`<td>${c}</td>`).join('')}</tr>`;
+  }).join('');
+  document.getElementById('fnPlayers').innerHTML = t.fn_pir;
+  document.getElementById('fnPM').innerHTML      = t.fn_pm;
+  document.getElementById('fnAbbrev').textContent    = t.abbrev_legend;
+  document.getElementById('fnAbbrevAdv').textContent = t.abbrev_legend_adv;
+  restoreSort('player');
+  restoreSort('playerAdv');
+}
+
+function renderGameTable() {
+  const t = T[lang];
+  const wl = t.wl;
+  document.getElementById('gameHead').innerHTML = t.game_cols.map((c,i) =>
+    `<th class="sortable" onclick="sortTable('game',${i})">${c}</th>`
+  ).join('');
+  document.getElementById('gameBody').innerHTML = GAME_ROWS.map(r => {
+    const cls = r.win ? 'win' : 'loss';
+    // Swap W/L cell (index 4)
+    const cells = [...r.cells];
+    cells[4] = r.win ? wl[0] : wl[1];
+    return `<tr class="${cls}">${cells.map(c=>`<td>${c}</td>`).join('')}</tr>`;
+  }).join('');
+  restoreSort('game');
+}
+
+function renderSchedule() {
+  const t = T[lang];
+  document.getElementById('scheduleHead').innerHTML =
+    t.schedule_cols.map(c => `<th>${c}</th>`).join('');
+  document.getElementById('scheduleBody').innerHTML = SCHEDULE.map(r => {
+    const isHome = r.home === 'DMTK';
+    const badge  = `<span style="font-size:0.65rem;font-weight:700;padding:1px 5px;border-radius:3px;background:${isHome?'#0A1F5C':'#e0e0e0'};color:${isHome?'white':'#555'}">${isHome ? t.schedule_home : t.schedule_away}</span>`;
+    const homeCell = isHome ? `<b>DMTK</b>` : r.home;
+    const awayCell = isHome ? r.away : `<b>DMTK</b>`;
+    return `<tr><td>${r.date.slice(5)}</td><td>${r.time}</td><td style="text-align:left">${homeCell} ${isHome?badge:''}</td><td style="text-align:left">${awayCell} ${!isHome?badge:''}</td><td style="text-align:left;color:#666;font-size:0.75rem">${r.venue}</td></tr>`;
+  }).join('');
+  document.getElementById('scheduleSrc').textContent = t.schedule_src;
+}
+
+function renderAll() {
+  document.getElementById('langBtn').textContent = T[lang].lang_toggle;
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (T[lang][key]) el.textContent = T[lang][key];
+  });
+  renderHero();
+  renderLeaders();
+  renderPlayerTable();
+  renderGameTable();
+  renderSchedule();
+  document.getElementById('generated').textContent = T[lang].generated + ' ' + GENERATED;
+  renderChart();
+}
+
+function toggleLang() {
+  lang = lang==='hu' ? 'en' : 'hu';
+  localStorage.setItem('dmtk_lang', lang);
+  renderAll();
+}
+
+// ── Chart ─────────────────────────────────────────────────────────────────────
+function renderChart() {
+  const t = T[lang];
+  const labels = GAME_ROWS.map(r => r.cells[1] + ' ' + r.cells[2]);
+  const dmtk   = GAME_ROWS.map(r => parseInt(r.cells[3].split('–')[0])||0);
+  const opp    = GAME_ROWS.map(r => parseInt(r.cells[3].split('–')[1])||0);
+  const ctx    = document.getElementById('scoreChart').getContext('2d');
+  if (chartInstance) chartInstance.destroy();
+  chartInstance = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [
+        { label: t.dmtk_label, data: dmtk, backgroundColor: 'rgba(10,31,92,0.85)', borderRadius: 4 },
+        { label: t.opp_label,  data: opp,  backgroundColor: 'rgba(245,196,0,0.85)', borderRadius: 4 },
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: 'top', labels: { font: { size: 11 } } } },
+      scales: {
+        x: { ticks: { font: { size: 10 }, maxRotation: 30 } },
+        y: { beginAtZero: true, ticks: { stepSize: 10, font: { size: 10 } } }
+      }
+    }
+  });
+}
+
+// ── Sortable tables ───────────────────────────────────────────────────────────
+function sortTable(which, col) {
+  let asc;
+  if (which==='player') {
+    asc = (col===playerSortCol) ? !playerSortAsc : (col<=1 ? true : false);
+    playerSortCol=col; playerSortAsc=asc;
+  } else if (which==='playerAdv') {
+    asc = (col===playerAdvSortCol) ? !playerAdvSortAsc : (col<=1 ? true : false);
+    playerAdvSortCol=col; playerAdvSortAsc=asc;
+  } else {
+    asc = (col===gameSortCol) ? !gameSortAsc : true;
+    gameSortCol=col; gameSortAsc=asc;
+  }
+  const bodyId = which==='player' ? 'playerBody' : which==='playerAdv' ? 'playerAdvBody' : 'gameBody';
+  const headId = which==='player' ? 'playerHead' : which==='playerAdv' ? 'playerAdvHead' : 'gameHead';
+  const tbody  = document.getElementById(bodyId);
+  const ths    = document.getElementById(headId).querySelectorAll('th');
+  ths.forEach(t => t.classList.remove('sort-asc','sort-desc'));
+  ths[col].classList.add(asc ? 'sort-asc' : 'sort-desc');
+  const rows = Array.from(tbody.querySelectorAll('tr'));
+  rows.sort((a,b) => {
+    const av = a.cells[col] ? a.cells[col].textContent.trim() : '';
+    const bv = b.cells[col] ? b.cells[col].textContent.trim() : '';
+    const an = parseFloat(av.replace(/[%+—★]/g,''));
+    const bn = parseFloat(bv.replace(/[%+—★]/g,''));
+    if (!isNaN(an) && !isNaN(bn)) return asc ? an-bn : bn-an;
+    return asc ? av.localeCompare(bv,'hu') : bv.localeCompare(av,'hu');
+  });
+  rows.forEach(r => tbody.appendChild(r));
+  if (which==='player' || which==='playerAdv') {
+    const allRows = Array.from(tbody.querySelectorAll('tr'));
+    allRows.forEach((r,i) => {
+      r.classList.remove('top3');
+      if (i < 3) r.classList.add('top3');
+    });
+  }
+}
+
+function restoreSort(which) {
+  let col, asc, headId;
+  if (which==='player') {
+    col=playerSortCol; asc=playerSortAsc; headId='playerHead';
+  } else if (which==='playerAdv') {
+    col=playerAdvSortCol; asc=playerAdvSortAsc; headId='playerAdvHead';
+  } else {
+    col=gameSortCol; asc=gameSortAsc; headId='gameHead';
+  }
+  if (col < 0) return;
+  const ths = document.getElementById(headId).querySelectorAll('th');
+  ths.forEach(t => t.classList.remove('sort-asc','sort-desc'));
+  if (ths[col]) ths[col].classList.add(asc ? 'sort-asc' : 'sort-desc');
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+renderAll();
+</script>
+</body>
+</html>
