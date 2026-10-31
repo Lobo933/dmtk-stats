@@ -135,7 +135,7 @@ const PLAYER_ROWS= [{"jersey": "8", "display": "Sára", "top3": true, "cells": [
 const GAME_ROWS  = [{"result": "L", "cells": ["1", "10-18", "Parthus", "52–69", "V", "33.3%", "27.8%", "47.4%", "7", "17", "28"], "win": false}, {"result": "L", "cells": ["2", "10-21", "VESC", "57–87", "V", "33.3%", "6.2%", "43.2%", "10", "29", "49"], "win": false}];
 const SCHEDULE   = [{"date": "2026-11-07", "time": "12:00", "home": "DMTK", "away": "OSE Lions U18L", "venue": ""}, {"date": "2026-11-21", "time": "10:00", "home": "DMTK", "away": "Parthus SE", "venue": ""}, {"date": "2026-11-24", "time": "18:00", "home": "DMTK", "away": "VESC", "venue": ""}];
 const N_GAMES    = 2;
-const GENERATED  = "2026-10-31 13:48";
+const GENERATED  = "2026-10-31 14:15";
 
 // ── i18n ─────────────────────────────────────────────────────────────────────
 const T = {
@@ -268,7 +268,7 @@ function renderGameTable() {
   document.getElementById('gameBody').innerHTML = GAME_ROWS.map(r => {
     const cls = r.win ? 'win' : 'loss';
     const cells = [...r.cells];
-    cells[4] = r.win ? wl[0] : wl[1];
+    cells[4] = r.win ? wl[0] : wl[1];  // swap HU/EN W-L label on lang toggle
     return `<tr class="${cls}">${cells.map(c=>`<td>${c}</td>`).join('')}</tr>`;
   }).join('');
   restoreSort('game');
@@ -280,7 +280,7 @@ function renderSchedule() {
     t.schedule_cols.map(c => `<th>${c}</th>`).join('');
   document.getElementById('scheduleBody').innerHTML = SCHEDULE.map(r => {
     const isHome = r.home === 'DMTK';
-    const venue  = r.venue || '—';
+    const venue  = r.venue || '—';  // U18 schedule entries may have empty venue strings
     const badge  = `<span style="font-size:0.65rem;font-weight:700;padding:1px 5px;border-radius:3px;background:${isHome?'#0A1F5C':'#e0e0e0'};color:${isHome?'white':'#555'}">${isHome ? t.schedule_home : t.schedule_away}</span>`;
     const homeCell = isHome ? `<b>DMTK</b>` : r.home;
     const awayCell = isHome ? r.away : `<b>DMTK</b>`;

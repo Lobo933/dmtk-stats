@@ -135,7 +135,7 @@ const PLAYER_ROWS= [{"jersey": "23", "display": "Fanni", "top3": true, "cells": 
 const GAME_ROWS  = [{"result": "W", "cells": ["1", "09-12", "CEKK", "69–50", "GY", "52.5%", "50.0%", "33.3%", "14", "25", "40"], "win": true}, {"result": "L", "cells": ["2", "09-12", "Szolnoki sportcentrum", "51–99", "V", "53.3%", "50.0%", "37.0%", "6", "39", "39"], "win": false}, {"result": "W", "cells": ["3", "10-06", "KS Szeged", "48–39", "GY", "33.3%", "42.9%", "47.4%", "9", "35", "44"], "win": true}, {"result": "L", "cells": ["4", "10-20", "Kiss Lenke/B", "50–70", "V", "39.6%", "20.0%", "46.7%", "5", "41", "40"], "win": false}];
 const SCHEDULE   = [{"date": "2026-11-08", "time": "12:00", "home": "DMTK", "away": "Mezőberényi KK", "venue": "Kőrösi Csoma Sándor Ált. Isk. Tornaterme"}, {"date": "2026-11-10", "time": "18:00", "home": "DMTK", "away": "FSE Fóti Tigrisek/A", "venue": "Kőrösi Csoma Sándor Ált. Isk. Tornaterme"}, {"date": "2026-11-14", "time": "11:00", "home": "BKG-Veresegyház", "away": "DMTK", "venue": "Veresegyházi Kosárlabda Csarnok"}, {"date": "2026-11-21", "time": "11:00", "home": "KS Szeged U16", "away": "DMTK", "venue": "Városi Sportcsarnok"}, {"date": "2026-11-28", "time": "11:00", "home": "DMTK", "away": "Kiss Lenke KS/B", "venue": "Kőrösi Csoma Sándor Ált. Isk. Tornaterme"}, {"date": "2026-12-05", "time": "11:00", "home": "FSE Fóti Tigrisek/A", "away": "DMTK", "venue": "Bajza József Ált. Isk. Tornacsarnoka"}, {"date": "2026-12-11", "time": "15:30", "home": "Mezőberényi KK", "away": "DMTK", "venue": "Molnár Miklós Sportcsarnok"}, {"date": "2026-12-15", "time": "18:00", "home": "DMTK", "away": "BKG-Veresegyház", "venue": "Kőrösi Csoma Sándor Ált. Isk. Tornaterme"}];
 const N_GAMES    = 4;
-const GENERATED  = "2026-10-31 13:48";
+const GENERATED  = "2026-10-31 14:15";
 
 // ── i18n ─────────────────────────────────────────────────────────────────────
 const T = {
@@ -268,7 +268,7 @@ function renderGameTable() {
   document.getElementById('gameBody').innerHTML = GAME_ROWS.map(r => {
     const cls = r.win ? 'win' : 'loss';
     const cells = [...r.cells];
-    cells[4] = r.win ? wl[0] : wl[1];
+    cells[4] = r.win ? wl[0] : wl[1];  // swap HU/EN W-L label on lang toggle
     return `<tr class="${cls}">${cells.map(c=>`<td>${c}</td>`).join('')}</tr>`;
   }).join('');
   restoreSort('game');
@@ -280,7 +280,7 @@ function renderSchedule() {
     t.schedule_cols.map(c => `<th>${c}</th>`).join('');
   document.getElementById('scheduleBody').innerHTML = SCHEDULE.map(r => {
     const isHome = r.home === 'DMTK';
-    const venue  = r.venue || '—';
+    const venue  = r.venue || '—';  // U18 schedule entries may have empty venue strings
     const badge  = `<span style="font-size:0.65rem;font-weight:700;padding:1px 5px;border-radius:3px;background:${isHome?'#0A1F5C':'#e0e0e0'};color:${isHome?'white':'#555'}">${isHome ? t.schedule_home : t.schedule_away}</span>`;
     const homeCell = isHome ? `<b>DMTK</b>` : r.home;
     const awayCell = isHome ? r.away : `<b>DMTK</b>`;
