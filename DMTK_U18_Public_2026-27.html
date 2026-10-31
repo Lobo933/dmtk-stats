@@ -104,7 +104,7 @@ tr.top3 td{background:#fff8e1;font-weight:600}
   </div>
 
   <div class="section">
-    <h2 data-i18n="games_title">Meccsnaplő</h2>
+    <h2 data-i18n="games_title">Meccsnapló</h2>
     <div class="table-scroll">
       <table id="gameTable">
         <thead><tr id="gameHead"></tr></thead>
@@ -135,7 +135,7 @@ const PLAYER_ROWS= [{"jersey": "8", "display": "Sára", "top3": true, "cells": [
 const GAME_ROWS  = [{"result": "L", "cells": ["1", "10-18", "Parthus", "52–69", "V", "33.3%", "27.8%", "47.4%", "7", "17", "28"], "win": false}, {"result": "L", "cells": ["2", "10-21", "VESC", "57–87", "V", "33.3%", "6.2%", "43.2%", "10", "29", "49"], "win": false}];
 const SCHEDULE   = [{"date": "2026-11-07", "time": "12:00", "home": "DMTK", "away": "OSE Lions U18L", "venue": ""}, {"date": "2026-11-21", "time": "10:00", "home": "DMTK", "away": "Parthus SE", "venue": ""}, {"date": "2026-11-24", "time": "18:00", "home": "DMTK", "away": "VESC", "venue": ""}];
 const N_GAMES    = 2;
-const GENERATED  = "2026-10-31 13:35";
+const GENERATED  = "2026-10-31 13:44";
 
 // ── i18n ─────────────────────────────────────────────────────────────────────
 const T = {
@@ -144,10 +144,10 @@ const T = {
     chart_title:   "Pontok meccsenként",
     leaders_title: "Kategóriavezetők",
     players_title: "Játékosok — PIR szerint rendezve (oszlopra kattintva átrendezhető)",
-    games_title:   "Meccsnaplő — oszlopra kattintva rendezhető",
+    games_title:   "Meccsnapló — oszlopra kattintva rendezhető",
     record:   "Mérleg",
     games:    "Meccsek",
-    pts_for:  "Átlag pont (sajét)",
+    pts_for:  "Átlag pont (saját)",
     pts_ag:   "Átlag pont (ellen)",
     margin:   "Átlag különbség",
     streak:   "Jelenlegi sorozat",
@@ -159,7 +159,7 @@ const T = {
     player_cols: ["#","Játékos","MJ","P/m","+/- össz","+/- átl","PIR össz","PIR átl","PPG","RPG","APG","SPG","BPG","TO","MK%","3P%"],
     player_cols_adv: ["#","Játékos","P40","AST/TO","PPS","Haszn%*","ORtg*","eMK%","TS%"],
     adv_title: "Haladó statisztikák",
-    game_cols:   ["#","Dátum","Ellenfél","Eredmény","GY/V","FG%","3P%","FT%","Gólp.","TO","Lep."],
+    game_cols:   ["#","Dátum","Ellenfél","Eredmény","GY/V","FG%","3P%","FT%","Asz.","TO","Lep."],
     fn_pir: "A táblázat <b>PIR</b> (Performance Index Rating) szerint van rendezve — ez az európai kosárlabda hivatalos összesített teljesítménymutatója. Minden pozitív dolog hozzáadódik (pont, lepattanó, assziszt, labdaszerzés, blokk), minden negatív levonódik (elveszített labda, rontott kísérlet, büntetőhiba). Minél magasabb, annál többet adott hozzá a játékos a meccshez.",
     fn_pm: "<b>+/- figyelembe vételénél légy óvatos!</b> 2 meccses mintán ez a mutató torzíthat — aki sérülés vagy pihentetés miatt lemaradt egy lefutott meccsről, erős pozitív +/- értéket kaphat anélkül, hogy bármit is tett volna.",
     generated: "Generálva:",

@@ -104,7 +104,7 @@ tr.top3 td{background:#fff8e1;font-weight:600}
   </div>
 
   <div class="section">
-    <h2 data-i18n="games_title">Meccsnaplő</h2>
+    <h2 data-i18n="games_title">Meccsnapló</h2>
     <div class="table-scroll">
       <table id="gameTable">
         <thead><tr id="gameHead"></tr></thead>
@@ -135,7 +135,7 @@ const PLAYER_ROWS= [{"jersey": "23", "display": "Fanni", "top3": true, "cells": 
 const GAME_ROWS  = [{"result": "W", "cells": ["1", "09-12", "CEKK", "69–50", "GY", "52.5%", "50.0%", "33.3%", "14", "25", "40"], "win": true}, {"result": "L", "cells": ["2", "09-12", "Szolnoki sportcentrum", "51–99", "V", "53.3%", "50.0%", "37.0%", "6", "39", "39"], "win": false}, {"result": "W", "cells": ["3", "10-06", "KS Szeged", "48–39", "GY", "33.3%", "42.9%", "47.4%", "9", "35", "44"], "win": true}, {"result": "L", "cells": ["4", "10-20", "Kiss Lenke/B", "50–70", "V", "39.6%", "20.0%", "46.7%", "5", "41", "40"], "win": false}];
 const SCHEDULE   = [{"date": "2026-11-08", "time": "12:00", "home": "DMTK", "away": "Mezőberényi KK", "venue": "Kőrösi Csoma Sándor Ált. Isk. Tornaterme"}, {"date": "2026-11-10", "time": "18:00", "home": "DMTK", "away": "FSE Fóti Tigrisek/A", "venue": "Kőrösi Csoma Sándor Ált. Isk. Tornaterme"}, {"date": "2026-11-14", "time": "11:00", "home": "BKG-Veresegyház", "away": "DMTK", "venue": "Veresegyházi Kosárlabda Csarnok"}, {"date": "2026-11-21", "time": "11:00", "home": "KS Szeged U16", "away": "DMTK", "venue": "Városi Sportcsarnok"}, {"date": "2026-11-28", "time": "11:00", "home": "DMTK", "away": "Kiss Lenke KS/B", "venue": "Kőrösi Csoma Sándor Ált. Isk. Tornaterme"}, {"date": "2026-12-05", "time": "11:00", "home": "FSE Fóti Tigrisek/A", "away": "DMTK", "venue": "Bajza József Ált. Isk. Tornacsarnoka"}, {"date": "2026-12-11", "time": "15:30", "home": "Mezőberényi KK", "away": "DMTK", "venue": "Molnár Miklós Sportcsarnok"}, {"date": "2026-12-15", "time": "18:00", "home": "DMTK", "away": "BKG-Veresegyház", "venue": "Kőrösi Csoma Sándor Ált. Isk. Tornaterme"}];
 const N_GAMES    = 4;
-const GENERATED  = "2026-10-31 13:35";
+const GENERATED  = "2026-10-31 13:44";
 
 // ── i18n ─────────────────────────────────────────────────────────────────────
 const T = {
@@ -144,7 +144,7 @@ const T = {
     chart_title:   "Pontok meccsenként",
     leaders_title: "Kategóriavezetők",
     players_title: "Játékosok — PIR szerint rendezve (oszlopra kattintva átrendezhető)",
-    games_title:   "Meccsnaplő — oszlopra kattintva rendezhető",
+    games_title:   "Meccsnapló — oszlopra kattintva rendezhető",
     record:   "Mérleg",
     games:    "Meccsek",
     pts_for:  "Átlag pont (saját)",
@@ -159,7 +159,7 @@ const T = {
     player_cols: ["#","Játékos","MJ","P/m","+/- össz","+/- átl","PIR össz","PIR átl","PPG","RPG","APG","SPG","BPG","TO","MK%","3P%"],
     player_cols_adv: ["#","Játékos","P40","AST/TO","PPS","Haszn%*","ORtg*","eMK%","TS%"],
     adv_title: "Haladó statisztikák",
-    game_cols:   ["#","Dátum","Ellenfél","Eredmény","GY/V","FG%","3P%","FT%","Gólp.","TO","Lep."],
+    game_cols:   ["#","Dátum","Ellenfél","Eredmény","GY/V","FG%","3P%","FT%","Asz.","TO","Lep."],
     fn_pir: "A táblázat <b>PIR</b> (Performance Index Rating) szerint van rendezve — ez az európai kosárlabda hivatalos összesített teljesítménymutatója. Minden pozitív dolog hozzáadódik (pont, lepattanó, assziszt, labdaszerzés, blokk), minden negatív levonódik (elveszített labda, rontott kísérlet, büntetőhiba). Minél magasabb, annál többet adott hozzá a játékos a meccshez.",
     fn_pm: "<b>+/- figyelembe vételénél légy óvatos!</b> 4 meccses mintán ez a mutató torzíthat — aki sérülés vagy pihentetés miatt lemaradt egy lefutott meccsről, erős pozitív +/- értéket kaphat anélkül, hogy bármit is tett volna.",
     generated: "Generálva:",
