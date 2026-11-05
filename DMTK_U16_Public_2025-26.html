@@ -93,7 +93,10 @@ tr.game-clickable:hover td{background:#f5f8ff !important}
 <div class="modal-overlay" id="bsModal" onclick="closeBsModal(event)">
   <div class="modal">
     <div class="modal-header">
-      <h3 id="bsTitle"></h3>
+      <div>
+        <h3 id="bsTitle"></h3>
+        <div id="bsSubtitle" style="font-size:0.75rem;color:rgba(255,255,255,0.65);margin-top:2px"></div>
+      </div>
       <span class="modal-score" id="bsScore"></span>
       <button class="modal-close" onclick="document.getElementById('bsModal').classList.remove('open')">✕</button>
     </div>
@@ -173,7 +176,7 @@ const SCHEDULE   = [];
 const STANDINGS  = null;
 const LAST_GAME  = null;
 const N_GAMES    = 20;
-const GENERATED  = "2026-11-05 16:29";
+const GENERATED  = "2026-11-05 16:39";
 
 // ── i18n ─────────────────────────────────────────────────────────────────────
 const T = {
@@ -217,11 +220,10 @@ const T = {
     standings_note: "A CEKK és Szolnoki elleni mérkőzések selejtező mérkőzések voltak, nem számítanak a bajnoki tabellába.",
     standings_src: "Forrás: mkosz.hu",
     last_game_label: "Legutóbbi meccs",
-    trend_label: "Trend (ut. 3)",
+    trend_label: "Trend",
   },
   en: {
     lang_toggle:   "HU",
-    chart_title:   "Points Per Game",
     leaders_title: "Category Leaders",
     players_title: "Player Stats — sorted by PIR (click column to re-sort)",
     games_title:   "Game Log — click column to sort",
@@ -259,7 +261,7 @@ const T = {
     standings_note: "The CEKK and Szolnoki games were qualifying fixtures and don't count toward the league standings.",
     standings_src: "Source: mkosz.hu",
     last_game_label: "Last Game",
-    trend_label: "Trend (L3)",
+    trend_label: "Trend",
   }
 };
 
@@ -356,10 +358,16 @@ function openBsModal(idx, tr) {
   const cells = Array.from(tr.querySelectorAll('td')).map(td => td.textContent);
   const date = cells[1], opponent = cells[2], score = cells[3];
   const win = tr.classList.contains('win');
-  document.getElementById('bsTitle').textContent = date + ' ' + opponent;
+  document.getElementById('bsTitle').textContent = opponent;
+  document.getElementById('bsSubtitle').textContent = date + ' · ' + score;
   const scoreEl = document.getElementById('bsScore');
-  scoreEl.textContent = score;
-  scoreEl.style.color = win ? '#4caf50' : '#e53935';
+  scoreEl.textContent = win ? (t.wl[0]) : (t.wl[1]);
+  scoreEl.style.background = win ? '#2e7d32' : '#c62828';
+  scoreEl.style.padding = '3px 9px';
+  scoreEl.style.borderRadius = '5px';
+  scoreEl.style.fontSize = '0.8rem';
+  scoreEl.style.color = 'white';
+  scoreEl.style.fontWeight = '700';
   const bs = GAME_BS[idx] || [];
   const cols = t.bs_cols;
   document.getElementById('bsHead').innerHTML =
@@ -455,17 +463,18 @@ function toggleLang() {
 // ── Chart ─────────────────────────────────────────────────────────────────────
 function renderChart() {
   const t = T[lang];
-  const labels = GAME_ROWS.map(r => r.cells[1] + ' ' + r.cells[2]);
-  const dmtk   = GAME_ROWS.map(r => parseInt(r.cells[3].split('–')[0])||0);
-  const opp    = GAME_ROWS.map(r => parseInt(r.cells[3].split('–')[1])||0);
-  const ctx    = document.getElementById('scoreChart').getContext('2d');
+  const labels  = GAME_ROWS.map(r => r.cells[1] + ' ' + r.cells[2]);
+  const dmtk    = GAME_ROWS.map(r => parseInt(r.cells[3].split('–')[0])||0);
+  const opp     = GAME_ROWS.map(r => parseInt(r.cells[3].split('–')[1])||0);
+  const dmtkClr = GAME_ROWS.map(r => r.win ? 'rgba(46,125,50,0.85)' : 'rgba(198,40,40,0.85)');
+  const ctx     = document.getElementById('scoreChart').getContext('2d');
   if (chartInstance) chartInstance.destroy();
   chartInstance = new Chart(ctx, {
     type: 'bar',
     data: {
       labels,
       datasets: [
-        { label: t.dmtk_label, data: dmtk, backgroundColor: 'rgba(10,31,92,0.85)', borderRadius: 4 },
+        { label: t.dmtk_label, data: dmtk, backgroundColor: dmtkClr, borderRadius: 4 },
         { label: t.opp_label,  data: opp,  backgroundColor: 'rgba(245,196,0,0.85)', borderRadius: 4 },
       ]
     },
