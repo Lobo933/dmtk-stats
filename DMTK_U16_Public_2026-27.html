@@ -200,7 +200,7 @@ const SCHEDULE   = [{"date": "2026-11-08", "time": "12:00", "home": "DMTK", "awa
 const STANDINGS  = {"title": "Leány Kadett — Kiemelt Regionális, Kelet", "source_url": "https://mkosz.hu/utanpotlas/x2627/whunu16/10198", "table": [{"team": "BKG-Veresegyház", "gp": 2, "w": 2, "l": 0, "pf": 127, "pa": 99, "pts": 4}, {"team": "Mezőberényi KK", "gp": 2, "w": 2, "l": 0, "pf": 110, "pa": 92, "pts": 4}, {"team": "Kiss Lenke KS/B", "gp": 3, "w": 2, "l": 1, "pf": 221, "pa": 181, "pts": 5}, {"team": "Dunaharaszti MTK", "gp": 2, "w": 1, "l": 1, "pf": 98, "pa": 109, "pts": 3}, {"team": "FSE Fóti Tigrisek/A", "gp": 2, "w": 0, "l": 2, "pf": 92, "pa": 116, "pts": 2}, {"team": "KS Szeged U16", "gp": 3, "w": 0, "l": 3, "pf": 145, "pa": 196, "pts": 3}]};
 const LAST_GAME  = {"date": "10.20.", "opponent": "Kiss Lenke/B", "score": "50–70", "win": false};
 const N_GAMES    = 4;
-const GENERATED  = "2026-11-05 16:48";
+const GENERATED  = "2026-11-05 16:52";
 
 // ── i18n ─────────────────────────────────────────────────────────────────────
 const T = {
@@ -209,7 +209,7 @@ const T = {
     chart_title:   "Pontok meccsenként",
     leaders_title: "Kategóriavezetők",
     players_title: "Játékosok — PIR szerint rendezve (oszlopra kattintva átrendezhető)",
-    games_title:   "Meccsnapló — oszlopra kattintva rendezhető",
+    games_title:   "Meccsnapló",
     record:   "Mérleg",
     games:    "Meccsek",
     pts_for:  "Átlag pont (saját)",
@@ -251,7 +251,7 @@ const T = {
     lang_toggle:   "HU",
     leaders_title: "Category Leaders",
     players_title: "Player Stats — sorted by PIR (click column to re-sort)",
-    games_title:   "Game Log — click column to sort",
+    games_title:   "Game Log",
     record:   "Record",
     games:    "Games",
     pts_for:  "Avg Pts For",
@@ -296,7 +296,6 @@ let lang = localStorage.getItem('dmtk_lang') || 'hu';
 let chartInstance = null;
 let playerSortCol = -1, playerSortAsc = true;
 let playerAdvSortCol = -1, playerAdvSortAsc = true;
-let gameSortCol = -1, gameSortAsc = true;
 
 // ── Render helpers ────────────────────────────────────────────────────────────
 function renderHero() {
@@ -367,8 +366,8 @@ function renderPlayerTable() {
 function renderGameTable() {
   const t = T[lang];
   const wl = t.wl;
-  document.getElementById('gameHead').innerHTML = t.game_cols.map((c,i) =>
-    `<th class="sortable" onclick="sortTable('game',${i})">${c}</th>`
+  document.getElementById('gameHead').innerHTML = t.game_cols.map(c =>
+    `<th>${c}</th>`
   ).join('');
   document.getElementById('gameBody').innerHTML = GAME_ROWS.map(r => {
     const cls = r.win ? 'win' : 'loss';
@@ -376,7 +375,6 @@ function renderGameTable() {
     cells[4] = r.win ? wl[0] : wl[1];
     return `<tr class="${cls} game-clickable" onclick="openBsModal(${r.idx},this)">${cells.map(c=>`<td>${c}</td>`).join('')}</tr>`;
   }).join('');
-  restoreSort('game');
 }
 
 function openBsModal(idx, tr) {
@@ -521,15 +519,12 @@ function sortTable(which, col) {
   if (which==='player') {
     asc = (col===playerSortCol) ? !playerSortAsc : (col<=1 ? true : false);
     playerSortCol=col; playerSortAsc=asc;
-  } else if (which==='playerAdv') {
+  } else {
     asc = (col===playerAdvSortCol) ? !playerAdvSortAsc : (col<=1 ? true : false);
     playerAdvSortCol=col; playerAdvSortAsc=asc;
-  } else {
-    asc = (col===gameSortCol) ? !gameSortAsc : true;
-    gameSortCol=col; gameSortAsc=asc;
   }
-  const bodyId = which==='player' ? 'playerBody' : which==='playerAdv' ? 'playerAdvBody' : 'gameBody';
-  const headId = which==='player' ? 'playerHead' : which==='playerAdv' ? 'playerAdvHead' : 'gameHead';
+  const bodyId = which==='player' ? 'playerBody' : 'playerAdvBody';
+  const headId = which==='player' ? 'playerHead' : 'playerAdvHead';
   const tbody  = document.getElementById(bodyId);
   const ths    = document.getElementById(headId).querySelectorAll('th');
   ths.forEach(t => t.classList.remove('sort-asc','sort-desc'));
@@ -557,10 +552,8 @@ function restoreSort(which) {
   let col, asc, headId;
   if (which==='player') {
     col=playerSortCol; asc=playerSortAsc; headId='playerHead';
-  } else if (which==='playerAdv') {
-    col=playerAdvSortCol; asc=playerAdvSortAsc; headId='playerAdvHead';
   } else {
-    col=gameSortCol; asc=gameSortAsc; headId='gameHead';
+    col=playerAdvSortCol; asc=playerAdvSortAsc; headId='playerAdvHead';
   }
   if (col < 0) return;
   const ths = document.getElementById(headId).querySelectorAll('th');
