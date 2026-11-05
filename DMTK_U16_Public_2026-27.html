@@ -31,8 +31,15 @@ th.sort-desc::after{content:' ▼';font-size:0.6rem}
 td{padding:5px 5px;text-align:center;border-bottom:1px solid #eee;white-space:nowrap}
 td:nth-child(2){text-align:left;min-width:80px}
 td:nth-child(3){text-align:left}
-th:nth-child(1),td:nth-child(1){position:sticky;left:0;z-index:2;background:inherit;min-width:28px}
-th:nth-child(2),td:nth-child(2){position:sticky;left:28px;z-index:2;background:inherit;min-width:80px}
+th:nth-child(1),th:nth-child(2){position:sticky;z-index:3;background:#0A1F5C}
+th:nth-child(1){left:0;min-width:28px}
+th:nth-child(2){left:28px;min-width:80px}
+td:nth-child(1),td:nth-child(2){position:sticky;z-index:2;background:#fff}
+td:nth-child(1){left:0;min-width:28px}
+td:nth-child(2){left:28px;min-width:80px}
+tr.win td:nth-child(1),tr.win td:nth-child(2){background:#e8f5e9}
+tr.loss td:nth-child(1),tr.loss td:nth-child(2){background:#ffeaea}
+tr.top3 td:nth-child(1),tr.top3 td:nth-child(2){background:#fff8e1}
 tr:hover td{background:#f0f4ff!important}
 tr.win td{background:#e8f5e9}
 tr.loss td{background:#ffeaea}
@@ -146,7 +153,7 @@ const GAME_ROWS  = [{"result": "W", "cells": ["1", "09.12.", "CEKK", "69–50", 
 const SCHEDULE   = [{"date": "2026-11-08", "time": "12:00", "home": "DMTK", "away": "Mezőberényi KK", "venue": "Kőrösi Csoma Sándor Ált. Isk. Tornaterme"}, {"date": "2026-11-10", "time": "18:00", "home": "DMTK", "away": "FSE Fóti Tigrisek/A", "venue": "Kőrösi Csoma Sándor Ált. Isk. Tornaterme"}, {"date": "2026-11-14", "time": "11:00", "home": "BKG-Veresegyház", "away": "DMTK", "venue": "Veresegyházi Kosárlabda Csarnok"}, {"date": "2026-11-21", "time": "11:00", "home": "KS Szeged U16", "away": "DMTK", "venue": "Városi Sportcsarnok"}, {"date": "2026-11-28", "time": "11:00", "home": "DMTK", "away": "Kiss Lenke KS/B", "venue": "Kőrösi Csoma Sándor Ált. Isk. Tornaterme"}, {"date": "2026-12-05", "time": "11:00", "home": "FSE Fóti Tigrisek/A", "away": "DMTK", "venue": "Bajza József Ált. Isk. Tornacsarnoka"}, {"date": "2026-12-11", "time": "15:30", "home": "Mezőberényi KK", "away": "DMTK", "venue": "Molnár Miklós Sportcsarnok"}, {"date": "2026-12-15", "time": "18:00", "home": "DMTK", "away": "BKG-Veresegyház", "venue": "Kőrösi Csoma Sándor Ált. Isk. Tornaterme"}];
 const LAST_GAME  = {"date": "10.20.", "opponent": "Kiss Lenke/B", "score": "50–70", "win": false};
 const N_GAMES    = 4;
-const GENERATED  = "2026-11-05 13:47";
+const GENERATED  = "2026-11-05 14:38";
 
 // ── i18n ─────────────────────────────────────────────────────────────────────
 const T = {

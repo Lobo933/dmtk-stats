@@ -31,8 +31,15 @@ th.sort-desc::after{content:' ▼';font-size:0.6rem}
 td{padding:5px 5px;text-align:center;border-bottom:1px solid #eee;white-space:nowrap}
 td:nth-child(2){text-align:left;min-width:80px}
 td:nth-child(3){text-align:left}
-th:nth-child(1),td:nth-child(1){position:sticky;left:0;z-index:2;background:inherit;min-width:28px}
-th:nth-child(2),td:nth-child(2){position:sticky;left:28px;z-index:2;background:inherit;min-width:80px}
+th:nth-child(1),th:nth-child(2){position:sticky;z-index:3;background:#0A1F5C}
+th:nth-child(1){left:0;min-width:28px}
+th:nth-child(2){left:28px;min-width:80px}
+td:nth-child(1),td:nth-child(2){position:sticky;z-index:2;background:#fff}
+td:nth-child(1){left:0;min-width:28px}
+td:nth-child(2){left:28px;min-width:80px}
+tr.win td:nth-child(1),tr.win td:nth-child(2){background:#e8f5e9}
+tr.loss td:nth-child(1),tr.loss td:nth-child(2){background:#ffeaea}
+tr.top3 td:nth-child(1),tr.top3 td:nth-child(2){background:#fff8e1}
 tr:hover td{background:#f0f4ff!important}
 tr.win td{background:#e8f5e9}
 tr.loss td{background:#ffeaea}
@@ -146,7 +153,7 @@ const GAME_ROWS  = [{"result": "L", "cells": ["1", "10.18.", "Parthus", "52–69
 const SCHEDULE   = [{"date": "2026-11-07", "time": "12:00", "home": "DMTK", "away": "OSE Lions U18L", "venue": ""}, {"date": "2026-11-21", "time": "10:00", "home": "DMTK", "away": "Parthus SE", "venue": ""}, {"date": "2026-11-24", "time": "18:00", "home": "DMTK", "away": "VESC", "venue": ""}];
 const LAST_GAME  = {"date": "10.21.", "opponent": "VESC", "score": "57–87", "win": false};
 const N_GAMES    = 2;
-const GENERATED  = "2026-11-05 13:47";
+const GENERATED  = "2026-11-05 14:38";
 
 // ── i18n ─────────────────────────────────────────────────────────────────────
 const T = {
