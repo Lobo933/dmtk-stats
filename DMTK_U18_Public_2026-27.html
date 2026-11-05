@@ -158,6 +158,7 @@ tr.game-clickable:hover td{background:#f5f8ff !important}
     </div>
   </div>
 
+
   <div class="section">
     <h2 data-i18n="schedule_title">Következő mérkőzések</h2>
     <div class="table-scroll">
@@ -180,9 +181,10 @@ const PLAYER_ROWS= [{"jersey": "8", "display": "Sára", "top3": true, "cells": [
 const GAME_ROWS  = [{"result": "L", "cells": ["1", "10.18.", "Parthus", "52–69", "V", "33.3%", "27.8%", "47.4%", "7", "17", "28"], "win": false, "idx": 0}, {"result": "L", "cells": ["2", "10.21.", "VESC", "57–87", "V", "33.3%", "6.2%", "43.2%", "10", "29", "49"], "win": false, "idx": 1}];
 const GAME_BS    = [[{"name": "Sára", "jersey": 8, "pts": 19, "reb": 2, "ast": 1, "stl": 4, "blk": 1, "pir": 10, "pm": -11, "tim": "38:36"}, {"name": "Panna", "jersey": 13, "pts": 18, "reb": 1, "ast": 1, "stl": 5, "blk": 0, "pir": 14, "pm": -9, "tim": "31:05"}, {"name": "De. Zselyke", "jersey": 77, "pts": 7, "reb": 5, "ast": 2, "stl": 0, "blk": 0, "pir": 1, "pm": -12, "tim": "36:27"}, {"name": "R. Míra", "jersey": 12, "pts": 4, "reb": 6, "ast": 2, "stl": 0, "blk": 0, "pir": 11, "pm": 2, "tim": "21:51"}, {"name": "Fanni", "jersey": 23, "pts": 2, "reb": 7, "ast": 0, "stl": 3, "blk": 1, "pir": 6, "pm": -21, "tim": "19:49"}, {"name": "Zsani", "jersey": 24, "pts": 2, "reb": 6, "ast": 0, "stl": 2, "blk": 0, "pir": -3, "pm": -12, "tim": "33:59"}, {"name": "Da. Zselyke", "jersey": 27, "pts": 0, "reb": 0, "ast": 0, "stl": 0, "blk": 0, "pir": 0, "pm": -5, "tim": "0:50"}, {"name": "Bogi", "jersey": 32, "pts": 0, "reb": 0, "ast": 0, "stl": 0, "blk": 0, "pir": 0, "pm": -5, "tim": "0:50"}, {"name": "Aliz", "jersey": 7, "pts": 0, "reb": 1, "ast": 1, "stl": 0, "blk": 0, "pir": 0, "pm": -3, "tim": "6:57"}, {"name": "Nikol", "jersey": 19, "pts": 0, "reb": 0, "ast": 0, "stl": 0, "blk": 0, "pir": -1, "pm": 0, "tim": "2:02"}, {"name": "Adri", "jersey": 25, "pts": 0, "reb": 0, "ast": 0, "stl": 0, "blk": 0, "pir": 0, "pm": -2, "tim": "2:15"}, {"name": "M. Míra", "jersey": 9, "pts": 0, "reb": 0, "ast": 0, "stl": 0, "blk": 0, "pir": 0, "pm": -7, "tim": "5:19"}], [{"name": "Sára", "jersey": 8, "pts": 21, "reb": 13, "ast": 1, "stl": 2, "blk": 0, "pir": 20, "pm": -21, "tim": "32:23"}, {"name": "De. Zselyke", "jersey": 77, "pts": 9, "reb": 3, "ast": 3, "stl": 2, "blk": 0, "pir": 6, "pm": -21, "tim": "34:26"}, {"name": "Panna", "jersey": 13, "pts": 7, "reb": 10, "ast": 1, "stl": 5, "blk": 0, "pir": 11, "pm": -17, "tim": "29:31"}, {"name": "Fanni", "jersey": 23, "pts": 7, "reb": 6, "ast": 1, "stl": 1, "blk": 0, "pir": 9, "pm": -5, "tim": "15:41"}, {"name": "Zsani", "jersey": 24, "pts": 7, "reb": 12, "ast": 2, "stl": 1, "blk": 1, "pir": 10, "pm": -8, "tim": "27:24"}, {"name": "R. Míra", "jersey": 12, "pts": 6, "reb": 2, "ast": 1, "stl": 2, "blk": 1, "pir": 10, "pm": -9, "tim": "17:51"}, {"name": "Aliz", "jersey": 7, "pts": 0, "reb": 1, "ast": 1, "stl": 0, "blk": 0, "pir": -2, "pm": -16, "tim": "8:30"}, {"name": "Adri", "jersey": 25, "pts": 0, "reb": 0, "ast": 0, "stl": 0, "blk": 0, "pir": -2, "pm": -5, "tim": "3:03"}, {"name": "V. Bogi", "jersey": 91, "pts": 0, "reb": 0, "ast": 0, "stl": 0, "blk": 0, "pir": -2, "pm": -15, "tim": "3:26"}, {"name": "M. Míra", "jersey": 9, "pts": 0, "reb": 2, "ast": 0, "stl": 3, "blk": 1, "pir": -9, "pm": -33, "tim": "27:45"}]];
 const SCHEDULE   = [{"date": "2026-11-07", "time": "12:00", "home": "DMTK", "away": "OSE Lions U18L", "venue": ""}, {"date": "2026-11-21", "time": "10:00", "home": "DMTK", "away": "Parthus SE", "venue": ""}, {"date": "2026-11-24", "time": "18:00", "home": "DMTK", "away": "VESC", "venue": ""}];
+const STANDINGS  = null;
 const LAST_GAME  = {"date": "10.21.", "opponent": "VESC", "score": "57–87", "win": false};
 const N_GAMES    = 2;
-const GENERATED  = "2026-11-05 16:18";
+const GENERATED  = "2026-11-05 16:19";
 
 // ── i18n ─────────────────────────────────────────────────────────────────────
 const T = {
@@ -221,6 +223,10 @@ const T = {
     schedule_home: "H",
     schedule_away: "V",
     schedule_src: "Forrás: mkosz.hu · frissítve: 2026-11-05",  // date baked in at build time
+    standings_title: "Tabella",
+    standings_cols: ["#","Csapat","M","GY","V","+/-","Pont"],
+    standings_note: "A CEKK és Szolnoki elleni mérkőzések előkészítő meccsek voltak, nem számítanak a bajnoki tabellába.",
+    standings_src: "Forrás: mkosz.hu",
     last_game_label: "Legutóbbi meccs",
     trend_label: "Trend (ut. 3)",
   },
@@ -259,6 +265,10 @@ const T = {
     schedule_home: "H",
     schedule_away: "A",
     schedule_src: "Source: mkosz.hu · updated: 2026-11-05",  // date baked in at build time
+    standings_title: "Standings",
+    standings_cols: ["#","Team","GP","W","L","+/-","Pts"],
+    standings_note: "The CEKK and Szolnoki games were preliminary fixtures and don't count toward the league standings.",
+    standings_src: "Source: mkosz.hu",
     last_game_label: "Last Game",
     trend_label: "Trend (L3)",
   }
@@ -386,6 +396,33 @@ function closeBsModal(e) {
     document.getElementById('bsModal').classList.remove('open');
 }
 
+function renderStandings() {
+  const t = T[lang];
+  const head = document.getElementById('standingsHead');
+  if (!head || !STANDINGS) return;  // section only present when standings exist
+  head.innerHTML = t.standings_cols.map((c,i) =>
+    `<th style="${i===1?'text-align:left':''}">${c}</th>`).join('');
+  document.getElementById('standingsBody').innerHTML = STANDINGS.table.map((r,i) => {
+    const isDmtk = r.team.toLowerCase().includes('dunaharaszti') || r.team.toLowerCase().includes('dmtk');
+    const diff = r.pf - r.pa;
+    const diffStr = diff > 0 ? '+'+diff : ''+diff;
+    const style = isDmtk ? 'background:#fff8e1;font-weight:700' : '';
+    return `<tr style="${style}">
+      <td>${i+1}</td>
+      <td style="text-align:left">${r.team}</td>
+      <td>${r.gp}</td>
+      <td>${r.w}</td>
+      <td>${r.l}</td>
+      <td>${diffStr}</td>
+      <td>${r.pts}</td>
+    </tr>`;
+  }).join('');
+  const note = document.getElementById('standingsNote');
+  if (note) note.textContent = t.standings_note;
+  const src = document.getElementById('standingsSrc');
+  if (src) src.innerHTML = `<a href="${STANDINGS.source_url}" target="_blank" rel="noopener" style="color:#0A1F5C">${t.standings_src}</a>`;
+}
+
 function renderSchedule() {
   const t = T[lang];
   const head = document.getElementById('scheduleHead');
@@ -414,6 +451,7 @@ function renderAll() {
   renderLeaders();
   renderPlayerTable();
   renderGameTable();
+  renderStandings();
   renderSchedule();
   document.getElementById('generated').textContent = T[lang].generated + ' ' + GENERATED;
   renderChart();

@@ -159,6 +159,18 @@ tr.game-clickable:hover td{background:#f5f8ff !important}
   </div>
 
   <div class="section">
+    <h2 data-i18n="standings_title">Tabella</h2>
+    <div class="table-scroll">
+      <table id="standingsTable">
+        <thead><tr id="standingsHead"></tr></thead>
+        <tbody id="standingsBody"></tbody>
+      </table>
+    </div>
+    <p class="footnote" style="margin-top:6px" id="standingsNote"></p>
+    <p class="footnote" style="margin-top:4px" id="standingsSrc"></p>
+  </div>
+
+  <div class="section">
     <h2 data-i18n="schedule_title">Következő mérkőzések</h2>
     <div class="table-scroll">
       <table id="scheduleTable">
@@ -180,9 +192,10 @@ const PLAYER_ROWS= [{"jersey": "23", "display": "Fanni", "top3": true, "cells": 
 const GAME_ROWS  = [{"result": "W", "cells": ["1", "09.12.", "CEKK", "69–50", "GY", "52.5%", "50.0%", "33.3%", "14", "25", "40"], "win": true, "idx": 0}, {"result": "W", "cells": ["2", "09.12.", "Szolnoki sportcentrum", "99–51", "GY", "53.3%", "50.0%", "37.0%", "6", "39", "39"], "win": true, "idx": 1}, {"result": "W", "cells": ["3", "10.06.", "KS Szeged", "48–39", "GY", "33.3%", "42.9%", "47.4%", "9", "35", "44"], "win": true, "idx": 2}, {"result": "L", "cells": ["4", "10.20.", "Kiss Lenke/B", "50–70", "V", "39.6%", "20.0%", "46.7%", "5", "41", "40"], "win": false, "idx": 3}];
 const GAME_BS    = [[{"name": "Zselyke", "jersey": 77, "pts": 21, "reb": 6, "ast": 3, "stl": 3, "blk": 0, "pir": 18, "pm": 20, "tim": "38:30"}, {"name": "Fanni", "jersey": 23, "pts": 20, "reb": 18, "ast": 3, "stl": 4, "blk": 2, "pir": 35, "pm": 26, "tim": "36:22"}, {"name": "R. Míra", "jersey": 12, "pts": 10, "reb": 6, "ast": 4, "stl": 2, "blk": 0, "pir": 11, "pm": 27, "tim": "35:14"}, {"name": "Nikol", "jersey": 19, "pts": 10, "reb": 5, "ast": 1, "stl": 4, "blk": 0, "pir": 11, "pm": 20, "tim": "37:24"}, {"name": "Viki", "jersey": 2, "pts": 4, "reb": 4, "ast": 3, "stl": 2, "blk": 0, "pir": 4, "pm": 13, "tim": "35:04"}, {"name": "Eszti", "jersey": 27, "pts": 2, "reb": 0, "ast": 0, "stl": 0, "blk": 0, "pir": 0, "pm": -1, "tim": "8:12"}, {"name": "Sára", "jersey": 4, "pts": 2, "reb": 1, "ast": 0, "stl": 0, "blk": 0, "pir": 0, "pm": -7, "tim": "4:19"}, {"name": "Kitti", "jersey": 40, "pts": 0, "reb": 0, "ast": 0, "stl": 0, "blk": 0, "pir": 0, "pm": -1, "tim": "1:30"}, {"name": "Miri", "jersey": 28, "pts": 0, "reb": 0, "ast": 0, "stl": 0, "blk": 0, "pir": 0, "pm": 0, "tim": "0:25"}, {"name": "Enikő", "jersey": 30, "pts": 0, "reb": 0, "ast": 0, "stl": 0, "blk": 0, "pir": 0, "pm": -1, "tim": "1:30"}, {"name": "Emma", "jersey": 21, "pts": 0, "reb": 0, "ast": 0, "stl": 0, "blk": 0, "pir": 0, "pm": -1, "tim": "1:30"}], [{"name": "Nikol", "jersey": 19, "pts": 10, "reb": 4, "ast": 0, "stl": 0, "blk": 0, "pir": 10, "pm": -31, "tim": "27:45"}, {"name": "Zselyke", "jersey": 77, "pts": 9, "reb": 5, "ast": 0, "stl": 1, "blk": 0, "pir": 10, "pm": -20, "tim": "22:05"}, {"name": "Fanni", "jersey": 23, "pts": 7, "reb": 16, "ast": 0, "stl": 4, "blk": 2, "pir": 19, "pm": -37, "tim": "31:01"}, {"name": "R. Míra", "jersey": 12, "pts": 7, "reb": 7, "ast": 2, "stl": 3, "blk": 2, "pir": 7, "pm": -39, "tim": "34:38"}, {"name": "Eszti", "jersey": 27, "pts": 7, "reb": 1, "ast": 1, "stl": 0, "blk": 0, "pir": 4, "pm": -31, "tim": "19:34"}, {"name": "Kitti", "jersey": 40, "pts": 6, "reb": 4, "ast": 0, "stl": 3, "blk": 1, "pir": 7, "pm": -33, "tim": "22:44"}, {"name": "Sára", "jersey": 4, "pts": 4, "reb": 0, "ast": 1, "stl": 0, "blk": 2, "pir": -4, "pm": -9, "tim": "13:44"}, {"name": "Emma", "jersey": 21, "pts": 1, "reb": 0, "ast": 0, "stl": 0, "blk": 0, "pir": -4, "pm": -22, "tim": "8:07"}, {"name": "Viki", "jersey": 2, "pts": 0, "reb": 0, "ast": 2, "stl": 0, "blk": 0, "pir": -3, "pm": -3, "tim": "8:56"}, {"name": "K. Nóri", "jersey": 91, "pts": 0, "reb": 1, "ast": 0, "stl": 0, "blk": 0, "pir": 1, "pm": -10, "tim": "3:32"}, {"name": "Enikő", "jersey": 30, "pts": 0, "reb": 1, "ast": 0, "stl": 0, "blk": 0, "pir": -1, "pm": -5, "tim": "7:54"}], [{"name": "Fanni", "jersey": 23, "pts": 18, "reb": 16, "ast": 1, "stl": 3, "blk": 3, "pir": 28, "pm": 14, "tim": "32:53"}, {"name": "Zselyke", "jersey": 77, "pts": 11, "reb": 6, "ast": 2, "stl": 0, "blk": 1, "pir": 2, "pm": 9, "tim": "40:00"}, {"name": "Nikol", "jersey": 19, "pts": 11, "reb": 5, "ast": 1, "stl": 3, "blk": 1, "pir": 6, "pm": 9, "tim": "37:17"}, {"name": "R. Míra", "jersey": 12, "pts": 7, "reb": 9, "ast": 3, "stl": 4, "blk": 1, "pir": 10, "pm": 6, "tim": "32:19"}, {"name": "Viki", "jersey": 2, "pts": 1, "reb": 7, "ast": 1, "stl": 4, "blk": 1, "pir": 5, "pm": 9, "tim": "30:07"}, {"name": "Eszti", "jersey": 27, "pts": 0, "reb": 0, "ast": 0, "stl": 0, "blk": 0, "pir": -1, "pm": 1, "tim": "4:02"}, {"name": "Sára", "jersey": 4, "pts": 0, "reb": 0, "ast": 0, "stl": 1, "blk": 0, "pir": -1, "pm": -5, "tim": "7:41"}, {"name": "Nadin", "jersey": 20, "pts": 0, "reb": 1, "ast": 1, "stl": 0, "blk": 1, "pir": -9, "pm": 2, "tim": "15:41"}], [{"name": "Zselyke", "jersey": 77, "pts": 11, "reb": 3, "ast": 1, "stl": 2, "blk": 0, "pir": 7, "pm": -16, "tim": "30:51"}, {"name": "Fanni", "jersey": 23, "pts": 8, "reb": 18, "ast": 2, "stl": 6, "blk": 0, "pir": 19, "pm": -13, "tim": "29:45"}, {"name": "R. Míra", "jersey": 12, "pts": 6, "reb": 5, "ast": 1, "stl": 1, "blk": 1, "pir": 0, "pm": -13, "tim": "30:21"}, {"name": "Eszti", "jersey": 27, "pts": 6, "reb": 1, "ast": 0, "stl": 0, "blk": 0, "pir": -2, "pm": -21, "tim": "13:25"}, {"name": "Nikol", "jersey": 19, "pts": 5, "reb": 3, "ast": 1, "stl": 1, "blk": 0, "pir": -3, "pm": -8, "tim": "26:18"}, {"name": "Kitti", "jersey": 40, "pts": 5, "reb": 3, "ast": 0, "stl": 0, "blk": 1, "pir": 7, "pm": -7, "tim": "8:41"}, {"name": "Sára", "jersey": 4, "pts": 4, "reb": 1, "ast": 0, "stl": 1, "blk": 1, "pir": 1, "pm": -16, "tim": "14:31"}, {"name": "Nadin", "jersey": 20, "pts": 3, "reb": 0, "ast": 0, "stl": 2, "blk": 0, "pir": -9, "pm": -6, "tim": "19:42"}, {"name": "Viki", "jersey": 2, "pts": 2, "reb": 5, "ast": 0, "stl": 1, "blk": 0, "pir": 5, "pm": -14, "tim": "16:17"}, {"name": "Miri", "jersey": 28, "pts": 0, "reb": 0, "ast": 0, "stl": 0, "blk": 0, "pir": 0, "pm": -2, "tim": "1:08"}, {"name": "Petra", "jersey": 32, "pts": 0, "reb": 0, "ast": 0, "stl": 0, "blk": 0, "pir": 0, "pm": 2, "tim": "1:27"}, {"name": "Enikő", "jersey": 30, "pts": 0, "reb": 0, "ast": 0, "stl": 0, "blk": 0, "pir": -1, "pm": 2, "tim": "2:28"}, {"name": "Karina", "jersey": 10, "pts": 0, "reb": 1, "ast": 0, "stl": 0, "blk": 0, "pir": -1, "pm": 2, "tim": "5:06"}]];
 const SCHEDULE   = [{"date": "2026-11-08", "time": "12:00", "home": "DMTK", "away": "Mezőberényi KK", "venue": "Kőrösi Csoma Sándor Ált. Isk. Tornaterme"}, {"date": "2026-11-10", "time": "18:00", "home": "DMTK", "away": "FSE Fóti Tigrisek/A", "venue": "Kőrösi Csoma Sándor Ált. Isk. Tornaterme"}, {"date": "2026-11-14", "time": "11:00", "home": "BKG-Veresegyház", "away": "DMTK", "venue": "Veresegyházi Kosárlabda Csarnok"}, {"date": "2026-11-21", "time": "11:00", "home": "KS Szeged U16", "away": "DMTK", "venue": "Városi Sportcsarnok"}, {"date": "2026-11-28", "time": "11:00", "home": "DMTK", "away": "Kiss Lenke KS/B", "venue": "Kőrösi Csoma Sándor Ált. Isk. Tornaterme"}, {"date": "2026-12-05", "time": "11:00", "home": "FSE Fóti Tigrisek/A", "away": "DMTK", "venue": "Bajza József Ált. Isk. Tornacsarnoka"}, {"date": "2026-12-11", "time": "15:30", "home": "Mezőberényi KK", "away": "DMTK", "venue": "Molnár Miklós Sportcsarnok"}, {"date": "2026-12-15", "time": "18:00", "home": "DMTK", "away": "BKG-Veresegyház", "venue": "Kőrösi Csoma Sándor Ált. Isk. Tornaterme"}];
+const STANDINGS  = {"title": "Leány Kadett — Kiemelt Regionális, Kelet", "source_url": "https://mkosz.hu/utanpotlas/x2627/whunu16/10198", "table": [{"team": "BKG-Veresegyház", "gp": 2, "w": 2, "l": 0, "pf": 127, "pa": 99, "pts": 4}, {"team": "Mezőberényi KK", "gp": 2, "w": 2, "l": 0, "pf": 110, "pa": 92, "pts": 4}, {"team": "Kiss Lenke KS/B", "gp": 3, "w": 2, "l": 1, "pf": 221, "pa": 181, "pts": 5}, {"team": "Dunaharaszti MTK", "gp": 2, "w": 1, "l": 1, "pf": 98, "pa": 109, "pts": 3}, {"team": "FSE Fóti Tigrisek/A", "gp": 2, "w": 0, "l": 2, "pf": 92, "pa": 116, "pts": 2}, {"team": "KS Szeged U16", "gp": 3, "w": 0, "l": 3, "pf": 145, "pa": 196, "pts": 3}]};
 const LAST_GAME  = {"date": "10.20.", "opponent": "Kiss Lenke/B", "score": "50–70", "win": false};
 const N_GAMES    = 4;
-const GENERATED  = "2026-11-05 16:18";
+const GENERATED  = "2026-11-05 16:19";
 
 // ── i18n ─────────────────────────────────────────────────────────────────────
 const T = {
@@ -221,6 +234,10 @@ const T = {
     schedule_home: "H",
     schedule_away: "V",
     schedule_src: "Forrás: mkosz.hu · frissítve: 2026-11-05",  // date baked in at build time
+    standings_title: "Tabella",
+    standings_cols: ["#","Csapat","M","GY","V","+/-","Pont"],
+    standings_note: "A CEKK és Szolnoki elleni mérkőzések előkészítő meccsek voltak, nem számítanak a bajnoki tabellába.",
+    standings_src: "Forrás: mkosz.hu",
     last_game_label: "Legutóbbi meccs",
     trend_label: "Trend (ut. 3)",
   },
@@ -259,6 +276,10 @@ const T = {
     schedule_home: "H",
     schedule_away: "A",
     schedule_src: "Source: mkosz.hu · updated: 2026-11-05",  // date baked in at build time
+    standings_title: "Standings",
+    standings_cols: ["#","Team","GP","W","L","+/-","Pts"],
+    standings_note: "The CEKK and Szolnoki games were preliminary fixtures and don't count toward the league standings.",
+    standings_src: "Source: mkosz.hu",
     last_game_label: "Last Game",
     trend_label: "Trend (L3)",
   }
@@ -386,6 +407,33 @@ function closeBsModal(e) {
     document.getElementById('bsModal').classList.remove('open');
 }
 
+function renderStandings() {
+  const t = T[lang];
+  const head = document.getElementById('standingsHead');
+  if (!head || !STANDINGS) return;  // section only present when standings exist
+  head.innerHTML = t.standings_cols.map((c,i) =>
+    `<th style="${i===1?'text-align:left':''}">${c}</th>`).join('');
+  document.getElementById('standingsBody').innerHTML = STANDINGS.table.map((r,i) => {
+    const isDmtk = r.team.toLowerCase().includes('dunaharaszti') || r.team.toLowerCase().includes('dmtk');
+    const diff = r.pf - r.pa;
+    const diffStr = diff > 0 ? '+'+diff : ''+diff;
+    const style = isDmtk ? 'background:#fff8e1;font-weight:700' : '';
+    return `<tr style="${style}">
+      <td>${i+1}</td>
+      <td style="text-align:left">${r.team}</td>
+      <td>${r.gp}</td>
+      <td>${r.w}</td>
+      <td>${r.l}</td>
+      <td>${diffStr}</td>
+      <td>${r.pts}</td>
+    </tr>`;
+  }).join('');
+  const note = document.getElementById('standingsNote');
+  if (note) note.textContent = t.standings_note;
+  const src = document.getElementById('standingsSrc');
+  if (src) src.innerHTML = `<a href="${STANDINGS.source_url}" target="_blank" rel="noopener" style="color:#0A1F5C">${t.standings_src}</a>`;
+}
+
 function renderSchedule() {
   const t = T[lang];
   const head = document.getElementById('scheduleHead');
@@ -414,6 +462,7 @@ function renderAll() {
   renderLeaders();
   renderPlayerTable();
   renderGameTable();
+  renderStandings();
   renderSchedule();
   document.getElementById('generated').textContent = T[lang].generated + ' ' + GENERATED;
   renderChart();
