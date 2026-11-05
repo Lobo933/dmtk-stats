@@ -176,7 +176,7 @@ const SCHEDULE   = [];
 const STANDINGS  = null;
 const LAST_GAME  = null;
 const N_GAMES    = 20;
-const GENERATED  = "2026-11-05 16:39";
+const GENERATED  = "2026-11-05 16:42";
 
 // ── i18n ─────────────────────────────────────────────────────────────────────
 const T = {
@@ -221,6 +221,7 @@ const T = {
     standings_src: "Forrás: mkosz.hu",
     last_game_label: "Legutóbbi meccs",
     trend_label: "Trend",
+    trend_tip: "Utolsó 3 meccs pontátlaga az egész szezon átlagához képest",
   },
   en: {
     lang_toggle:   "HU",
@@ -262,6 +263,7 @@ const T = {
     standings_src: "Source: mkosz.hu",
     last_game_label: "Last Game",
     trend_label: "Trend",
+    trend_tip: "Last 3 games PPG vs season average",
   }
 };
 
@@ -316,7 +318,7 @@ function renderPlayerTable() {
       // Last column is trend — color it based on arrow direction
       if (i === r.cells.length - 1) {
         const tc = c.startsWith('↑') ? 'trend-up' : c.startsWith('↓') ? 'trend-dn' : '';
-        return `<td class="${tc}">${c}</td>`;
+        return `<td class="${tc}" title="${T[lang].trend_tip}">${c}</td>`;
       }
       return `<td>${c}</td>`;
     });

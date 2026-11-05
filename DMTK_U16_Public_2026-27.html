@@ -198,7 +198,7 @@ const SCHEDULE   = [{"date": "2026-11-08", "time": "12:00", "home": "DMTK", "awa
 const STANDINGS  = {"title": "Leány Kadett — Kiemelt Regionális, Kelet", "source_url": "https://mkosz.hu/utanpotlas/x2627/whunu16/10198", "table": [{"team": "BKG-Veresegyház", "gp": 2, "w": 2, "l": 0, "pf": 127, "pa": 99, "pts": 4}, {"team": "Mezőberényi KK", "gp": 2, "w": 2, "l": 0, "pf": 110, "pa": 92, "pts": 4}, {"team": "Kiss Lenke KS/B", "gp": 3, "w": 2, "l": 1, "pf": 221, "pa": 181, "pts": 5}, {"team": "Dunaharaszti MTK", "gp": 2, "w": 1, "l": 1, "pf": 98, "pa": 109, "pts": 3}, {"team": "FSE Fóti Tigrisek/A", "gp": 2, "w": 0, "l": 2, "pf": 92, "pa": 116, "pts": 2}, {"team": "KS Szeged U16", "gp": 3, "w": 0, "l": 3, "pf": 145, "pa": 196, "pts": 3}]};
 const LAST_GAME  = {"date": "10.20.", "opponent": "Kiss Lenke/B", "score": "50–70", "win": false};
 const N_GAMES    = 4;
-const GENERATED  = "2026-11-05 16:39";
+const GENERATED  = "2026-11-05 16:42";
 
 // ── i18n ─────────────────────────────────────────────────────────────────────
 const T = {
@@ -243,6 +243,7 @@ const T = {
     standings_src: "Forrás: mkosz.hu",
     last_game_label: "Legutóbbi meccs",
     trend_label: "Trend",
+    trend_tip: "Utolsó 3 meccs pontátlaga az egész szezon átlagához képest",
   },
   en: {
     lang_toggle:   "HU",
@@ -284,6 +285,7 @@ const T = {
     standings_src: "Source: mkosz.hu",
     last_game_label: "Last Game",
     trend_label: "Trend",
+    trend_tip: "Last 3 games PPG vs season average",
   }
 };
 
@@ -338,7 +340,7 @@ function renderPlayerTable() {
       // Last column is trend — color it based on arrow direction
       if (i === r.cells.length - 1) {
         const tc = c.startsWith('↑') ? 'trend-up' : c.startsWith('↓') ? 'trend-dn' : '';
-        return `<td class="${tc}">${c}</td>`;
+        return `<td class="${tc}" title="${T[lang].trend_tip}">${c}</td>`;
       }
       return `<td>${c}</td>`;
     });
