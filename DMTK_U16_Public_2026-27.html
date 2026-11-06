@@ -206,7 +206,7 @@ const SCHEDULE   = [{"date": "2026-11-08", "time": "12:00", "home": "DMTK", "awa
 const STANDINGS  = {"title": "Leány Kadett — Kiemelt Regionális, Kelet", "source_url": "https://mkosz.hu/utanpotlas/x2627/whunu16/10198", "table": [{"team": "BKG-Veresegyház", "gp": 2, "w": 2, "l": 0, "pf": 127, "pa": 99, "pts": 4}, {"team": "Mezőberényi KK", "gp": 2, "w": 2, "l": 0, "pf": 110, "pa": 92, "pts": 4}, {"team": "Kiss Lenke KS/B", "gp": 3, "w": 2, "l": 1, "pf": 221, "pa": 181, "pts": 5}, {"team": "Dunaharaszti MTK", "gp": 2, "w": 1, "l": 1, "pf": 98, "pa": 109, "pts": 3}, {"team": "FSE Fóti Tigrisek/A", "gp": 2, "w": 0, "l": 2, "pf": 92, "pa": 116, "pts": 2}, {"team": "KS Szeged U16", "gp": 3, "w": 0, "l": 3, "pf": 145, "pa": 196, "pts": 3}]};
 const LAST_GAME  = {"date": "10.20.", "opponent": "Kiss Lenke/B", "score": "50–70", "win": false};
 const N_GAMES    = 4;
-const GENERATED  = "2026-11-06 19:26";
+const GENERATED  = "2026-11-06 19:29";
 
 // ── i18n ─────────────────────────────────────────────────────────────────────
 const T = {
@@ -230,7 +230,7 @@ const T = {
     wl:       ["GY","V"],
     player_cols: ["#","Játékos","MJ","P/m","+/- össz","+/- átl","PIR össz","PIR átl","PPG","RPG","APG","SPG","BPG","TO","MK%","3P%","Trend"],
     player_cols_adv: ["#","Játékos","P40","AST/TO","PPS","Haszn%*","ORtg*","eMK%","TS%"],
-    adv_title: "Haladó statisztikák",
+    adv_title: "Haladó statisztikák — ORtg* szerint rendezve",
     game_cols:   ["#","Dátum","Ellenfél","Eredmény","GY/V","FG%","3P%","FT%","Asz.","TO","Lep."],
     bs_cols:  ["Játékos","Idő","Pont","Lep.","Asz.","LSz.","Blk","PIR","+/-"],
     no_bs_data: "Nincs adatrész ehhez a meccshez.",
@@ -276,7 +276,7 @@ const T = {
     wl:       ["W","L"],
     player_cols: ["#","Player","GP","MPG","+/- tot","+/- avg","PIR tot","PIR avg","PPG","RPG","APG","SPG","BPG","TO","FG%","3P%","Trend"],
     player_cols_adv: ["#","Player","P40","AST/TO","PPS","Usg%*","ORtg*","eFG%","TS%"],
-    adv_title: "Advanced Stats",
+    adv_title: "Advanced Stats — sorted by ORtg*",
     game_cols:   ["#","Date","Opponent","Score","W/L","FG%","3P%","FT%","AST","TO","REB"],
     bs_cols:  ["Player","Time","PTS","REB","AST","STL","BLK","PIR","+/-"],
     no_bs_data: "No box score data for this game.",
@@ -309,7 +309,7 @@ const T = {
 let lang = localStorage.getItem('dmtk_lang') || 'hu';
 let chartInstance = null;
 let playerSortCol = -1, playerSortAsc = true;
-let playerAdvSortCol = -1, playerAdvSortAsc = true;
+let playerAdvSortCol = -1, playerAdvSortAsc = false;
 
 // ── Render helpers ────────────────────────────────────────────────────────────
 function renderHero() {
@@ -398,7 +398,7 @@ function renderPlayerTable() {
   document.getElementById('fnAbbrev').textContent    = t.abbrev_legend;
   document.getElementById('fnAbbrevAdv').textContent = t.abbrev_legend_adv;
   restoreSort('player');
-  restoreSort('playerAdv');
+  sortTable('playerAdv', 6);
 }
 
 function renderGameTable() {
