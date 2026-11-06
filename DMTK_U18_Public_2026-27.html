@@ -195,7 +195,8 @@ const SCHEDULE   = [{"date": "2026-11-07", "time": "12:00", "home": "DMTK", "awa
 const STANDINGS  = null;
 const LAST_GAME  = {"date": "10.21.", "opponent": "VESC", "score": "57–87", "win": false};
 const N_GAMES    = 5;
-const GENERATED  = "2026-11-06 19:29";
+const GENERATED  = "2026-11-06 20:14";
+const HAS_IMPACT = false;
 
 // ── i18n ─────────────────────────────────────────────────────────────────────
 const T = {
@@ -218,8 +219,8 @@ const T = {
     drtg:     "DRtg",
     wl:       ["GY","V"],
     player_cols: ["#","Játékos","MJ","P/m","+/- össz","+/- átl","PIR össz","PIR átl","PPG","RPG","APG","SPG","BPG","TO","MK%","3P%","Trend"],
-    player_cols_adv: ["#","Játékos","P40","AST/TO","PPS","Haszn%*","ORtg*","eMK%","TS%"],
-    adv_title: "Haladó statisztikák — ORtg* szerint rendezve",
+    player_cols_adv: ["#","Játékos","P40","AST/TO","PPS","Haszn%","ORtg","eMK%","TS%"].concat(HAS_IMPACT ? ["Impact"] : []),
+    adv_title: HAS_IMPACT ? "Haladó statisztikák — ORtg szerint rendezve" : "Haladó statisztikák — ORtg* szerint rendezve",
     game_cols:   ["#","Dátum","Ellenfél","Eredmény","GY/V","FG%","3P%","FT%","Asz.","TO","Lep."],
     bs_cols:  ["Játékos","Idő","Pont","Lep.","Asz.","LSz.","Blk","PIR","+/-"],
     no_bs_data: "Nincs adatrész ehhez a meccshez.",
@@ -229,7 +230,7 @@ const T = {
     dmtk_label: "DMTK",
     opp_label: "Ellenfél",
     abbrev_legend: "Rövidítések: MJ = mérkőzés játszott · P/m = perc/meccs · PPG = pont/meccs · RPG = lepattanó/meccs · APG = assziszt/meccs · SPG = labdaszerzés/meccs · BPG = blokk/meccs · TO = labdavesztés/meccs · MK% = mezőnykosár% · 3P% = hárompontos%",
-    abbrev_legend_adv: "Haladó mutatók: P40 = pont/40 perc · AST/TO = assziszt–labdavesztés arány · PPS = pont/mezőnykísérlet · eMK% = hatékony mezőnykosár% (a hármasokat 1,5-ös súllyal számolja) · TS% = valódi dobási% — pont / (2 × (mezőnykísérlet + 0,44 × büntető)) · Haszn%* = a csapat támadó lehetőségeiből felhasznált arány · ORtg* = közelítő egyéni offenzív hatékonyság (pont / 100 egyéni lehetőség) · * = közelítő mutató",
+    abbrev_legend_adv: HAS_IMPACT ? "Haladó mutatók: P40 = pont/40 perc · AST/TO = assziszt–labdavesztés arány · PPS = pont/mezőnykísérlet · eMK% = hatékony mezőnykosár% · TS% = valódi dobási% · Haszn% = a csapat támadó lehetőségeiből felhasznált arány · ORtg = egyéni offenzív hatékonyság (pont / 100 lehetőség) · Impact = saját jelenlét vs. hiány alapján mért hatás — pozitív = jobb csapat nélküle mint nélküle" : "Haladó mutatók: P40 = pont/40 perc · AST/TO = assziszt–labdavesztés arány · PPS = pont/mezőnykísérlet · eMK% = hatékony mezőnykosár% (a hármasokat 1,5-ös súllyal számolja) · TS% = valódi dobási% — pont / (2 × (mezőnykísérlet + 0,44 × büntető)) · Haszn%* = a csapat támadó lehetőségeiből felhasznált arány · ORtg* = közelítő egyéni offenzív hatékonyság (pont / 100 egyéni lehetőség) · * = közelítő mutató",
     schedule_title: "Következő mérkőzések",
     schedule_cols: ["Dátum","Idő","Hazai","Vendég","Helyszín"],
     schedule_home: "H",
@@ -264,8 +265,8 @@ const T = {
     drtg:     "DRtg",
     wl:       ["W","L"],
     player_cols: ["#","Player","GP","MPG","+/- tot","+/- avg","PIR tot","PIR avg","PPG","RPG","APG","SPG","BPG","TO","FG%","3P%","Trend"],
-    player_cols_adv: ["#","Player","P40","AST/TO","PPS","Usg%*","ORtg*","eFG%","TS%"],
-    adv_title: "Advanced Stats — sorted by ORtg*",
+    player_cols_adv: ["#","Player","P40","AST/TO","PPS","Usg%","ORtg","eFG%","TS%"].concat(HAS_IMPACT ? ["Impact"] : []),
+    adv_title: HAS_IMPACT ? "Advanced Stats — sorted by ORtg" : "Advanced Stats — sorted by ORtg*",
     game_cols:   ["#","Date","Opponent","Score","W/L","FG%","3P%","FT%","AST","TO","REB"],
     bs_cols:  ["Player","Time","PTS","REB","AST","STL","BLK","PIR","+/-"],
     no_bs_data: "No box score data for this game.",
@@ -275,7 +276,7 @@ const T = {
     dmtk_label: "DMTK",
     opp_label: "Opponent",
     abbrev_legend: "Abbreviations: GP = games played · MPG = minutes per game · PPG = points per game · RPG = rebounds per game · APG = assists per game · SPG = steals per game · BPG = blocks per game · TO = turnovers per game · FG% = field goal % · 3P% = three-point %",
-    abbrev_legend_adv: "Advanced stats: P40 = points per 40 min · AST/TO = assist-to-turnover ratio · PPS = points per field-goal attempt · eFG% = effective FG% (weights 3-pointers at 1.5×) · TS% = true shooting % — pts ÷ (2 × (FGA + 0.44 × FTA)) · Usg%* = share of team possessions used · ORtg* = approx. individual offensive rating (pts per 100 possessions) · * = approximation",
+    abbrev_legend_adv: HAS_IMPACT ? "Advanced stats: P40 = points per 40 min · AST/TO = assist-to-turnover ratio · PPS = points per field-goal attempt · eFG% = effective FG% · TS% = true shooting % · Usg% = share of team possessions used · ORtg = individual offensive rating (pts per 100 possessions) · Impact = net rating delta on/off court (positive = team scores better margin with player on)" : "Advanced stats: P40 = points per 40 min · AST/TO = assist-to-turnover ratio · PPS = points per field-goal attempt · eFG% = effective FG% (weights 3-pointers at 1.5×) · TS% = true shooting % — pts ÷ (2 × (FGA + 0.44 × FTA)) · Usg%* = share of team possessions used · ORtg* = approx. individual offensive rating (pts per 100 possessions) · * = approximation",
     schedule_title: "Upcoming Games",
     schedule_cols: ["Date","Time","Home","Away","Venue"],
     schedule_home: "H",
