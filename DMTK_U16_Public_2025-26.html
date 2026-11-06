@@ -61,6 +61,11 @@ footer{background:#0A1F5C;text-align:center;font-size:0.65rem;color:rgba(255,255
 .last-game .lg-result{font-size:0.75rem;font-weight:700;padding:3px 10px;border-radius:5px}
 .last-game .lg-result.win{background:#4caf50;color:white}
 .last-game .lg-result.loss{background:#e53935;color:white}
+.next-game{background:linear-gradient(90deg,#c9a000,#F5C400);color:#0A1F5C;padding:10px 16px;margin:12px 0 4px;border-radius:10px;display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:0.85rem}
+.next-game .ng-label{font-size:0.65rem;color:#0A1F5C;opacity:0.7;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:2px;font-weight:700}
+.next-game .ng-match{font-size:0.95rem;font-weight:800;line-height:1.25}
+.next-game .ng-meta{font-size:0.72rem;opacity:0.85;margin-top:2px}
+.next-game .ng-ha{font-size:0.7rem;font-weight:800;padding:3px 10px;border-radius:5px;background:#0A1F5C;color:#F5C400;white-space:nowrap}
 td.trend-up{color:#2e7d32;font-weight:700}
 td.trend-dn{color:#c62828;font-weight:700}
 @media(max-width:480px){
@@ -117,6 +122,7 @@ tr.game-clickable:hover td{background:#f5f8ff !important}
 <div class="container">
 
   <div class="stats-row" id="heroRow" style="margin-top:12px"></div>
+  <div id="nextGameBanner"></div>
   <div id="lastGameBanner"></div>
 
   <div class="section">
@@ -178,7 +184,7 @@ const SCHEDULE   = [];
 const STANDINGS  = null;
 const LAST_GAME  = null;
 const N_GAMES    = 20;
-const GENERATED  = "2026-11-06 14:40";
+const GENERATED  = "2026-11-06 14:49";
 
 // ── i18n ─────────────────────────────────────────────────────────────────────
 const T = {
@@ -223,6 +229,9 @@ const T = {
     standings_note: "A CEKK és Szolnoki elleni mérkőzések selejtező mérkőzések voltak, nem számítanak a bajnoki tabellába.",
     standings_src: "Forrás: mkosz.hu",
     last_game_label: "Legutóbbi meccs",
+    next_game_label: "Következő mérkőzés",
+    next_home: "Otthon",
+    next_away: "Idegenben",
     trend_label: "Trend",
     trend_tip: "Utolsó 3 meccs pontátlaga az egész szezon átlagához képest",
   },
@@ -266,6 +275,9 @@ const T = {
     standings_note: "The CEKK and Szolnoki games were qualifying fixtures and don't count toward the league standings.",
     standings_src: "Source: mkosz.hu",
     last_game_label: "Last Game",
+    next_game_label: "Next Game",
+    next_home: "Home",
+    next_away: "Away",
     trend_label: "Trend",
     trend_tip: "Last 3 games PPG vs season average",
   }
@@ -299,6 +311,30 @@ function renderLastGame() {
       <div class="lg-score">${LAST_GAME.score}</div>
       <div class="lg-result ${cls}">${wl}</div>
     </div>
+  </div>`;
+}
+
+function renderNextGame() {
+  const t = T[lang];
+  const el = document.getElementById('nextGameBanner');
+  if (!el) return;
+  // Find the first scheduled game on or after today (build date is a safe "today").
+  const today = GENERATED.slice(0,10);
+  const upcoming = (SCHEDULE || []).filter(r => r.date >= today).sort((a,b)=>a.date.localeCompare(b.date));
+  if (!upcoming.length) { el.innerHTML = ''; return; }
+  const g = upcoming[0];
+  const isHome = g.home === 'DMTK';
+  const opp    = isHome ? g.away : g.home;
+  const date   = g.date.slice(5).replace(/-/g,'.') + '.';
+  const venue  = g.venue ? ` · ${g.venue}` : '';
+  const ha     = isHome ? t.next_home : t.next_away;
+  el.innerHTML = `<div class="next-game">
+    <div>
+      <div class="ng-label">${t.next_game_label}</div>
+      <div class="ng-match">DMTK vs ${opp}</div>
+      <div class="ng-meta">${date} ${g.time}${venue}</div>
+    </div>
+    <div class="ng-ha">${ha}</div>
   </div>`;
 }
 
@@ -448,6 +484,7 @@ function renderAll() {
     if (T[lang][key]) el.textContent = T[lang][key];
   });
   renderHero();
+  renderNextGame();
   renderLastGame();
   renderLeaders();
   renderPlayerTable();
