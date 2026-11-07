@@ -191,7 +191,7 @@ const SCHEDULE   = [];
 const STANDINGS  = null;
 const LAST_GAME  = null;
 const N_GAMES    = 12;
-const GENERATED  = "2026-11-07 21:21";
+const GENERATED  = "2026-11-07 21:28";
 const HAS_IMPACT = true;
 
 // ── i18n ─────────────────────────────────────────────────────────────────────
@@ -328,8 +328,8 @@ function renderNextGame() {
   const t = T[lang];
   const el = document.getElementById('nextGameBanner');
   if (!el) return;
-  // Find the first scheduled game on or after today (build date is a safe "today").
-  const today = GENERATED.slice(0,10);
+  // Find the first scheduled game on or after today (browser date).
+  const today = new Date().toISOString().slice(0,10);
   const upcoming = (SCHEDULE || []).filter(r => r.date >= today).sort((a,b)=>a.date.localeCompare(b.date));
   if (!upcoming.length) { el.innerHTML = ''; return; }
   const g = upcoming[0];
