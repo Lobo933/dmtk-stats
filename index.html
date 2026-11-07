@@ -33,6 +33,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
 .about{background:white;border-radius:16px;padding:20px 22px 20px 24px;box-shadow:0 2px 16px rgba(10,31,92,0.10);font-size:0.78rem;color:#555;line-height:1.7;border-left:4px solid #F5C400}
 .about strong{color:#0A1F5C}
 .section-label{font-size:0.8rem;font-weight:800;color:#0A1F5C;letter-spacing:0.1em;text-transform:uppercase;margin:28px 0 14px;padding-left:4px;opacity:0.75}
+.archive-toggle{display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;margin:28px 0 0;padding:12px 16px;background:white;border-radius:12px;box-shadow:0 2px 8px rgba(10,31,92,0.08)}
+.archive-toggle-label{font-size:0.8rem;font-weight:800;color:#0A1F5C;letter-spacing:0.1em;text-transform:uppercase;opacity:0.75}
+.archive-toggle-arrow{color:#0A1F5C;font-size:0.9rem;opacity:0.5;transition:transform 0.2s}
+.archive-toggle.open .archive-toggle-arrow{transform:rotate(180deg)}
+.archive-cards{display:none;flex-direction:column;gap:16px;margin-top:12px;margin-bottom:24px}
+.archive-cards.open{display:flex}
 .card-header.archive{background:#4a5578}
 .card-header.archive .card-age{color:#cdd4e6}
 .hajra{display:block;margin-top:16px;font-size:1.1rem;font-weight:800;color:#F5C400;background:#0A1F5C;text-align:center;padding:10px 16px;border-radius:8px;letter-spacing:0.05em}
@@ -69,8 +75,11 @@ footer{background:#0A1F5C;text-align:center;font-size:0.65rem;color:rgba(255,255
         </div>
       </a>
     </div>
-    <div class="section-label">Archívum</div>
-    <div class="cards">
+    <div class="archive-toggle" id="archiveToggle" onclick="toggleArchive()">
+      <span class="archive-toggle-label">Archívum — 2025–26</span>
+      <span class="archive-toggle-arrow">▼</span>
+    </div>
+    <div class="archive-cards" id="archiveCards">
       <a class="card" href="DMTK_U1415_Public_2025-26.html">
         <div class="card-header archive">
           <div class="card-age">U14/15 LÁNYOK</div>
@@ -126,5 +135,13 @@ footer{background:#0A1F5C;text-align:center;font-size:0.65rem;color:rgba(255,255
   </div>
 </div>
 <footer>dmtk.lobo.wf<br>© 2026 Lobo</footer>
+<script>
+function toggleArchive() {
+  var t = document.getElementById('archiveToggle');
+  var c = document.getElementById('archiveCards');
+  t.classList.toggle('open');
+  c.classList.toggle('open');
+}
+</script>
 </body>
 </html>
