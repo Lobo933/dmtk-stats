@@ -86,10 +86,14 @@ td.trend-dn{color:#c62828;font-weight:700}
 .modal-close{background:none;border:none;color:white;font-size:1.4rem;cursor:pointer;line-height:1;padding:0 4px}
 .modal-body{padding:12px}
 .modal-body table{width:100%;border-collapse:collapse;font-size:0.82rem}
-.modal-body th{background:#f0f4f8;color:#555;font-weight:600;padding:6px 8px;text-align:center;position:sticky;top:0}
+.modal-body th{background:#f0f4f8;color:#555;font-weight:600;padding:6px 8px;text-align:center;position:sticky;top:0;cursor:pointer;user-select:none}
 .modal-body th:first-child{text-align:left}
+.modal-body th:hover{background:#e2e8f0}
+.modal-body th.sort-asc::after{content:' ▲';font-size:0.55rem;opacity:0.7}
+.modal-body th.sort-desc::after{content:' ▼';font-size:0.55rem;opacity:0.7}
 .modal-body td{padding:5px 8px;border-bottom:1px solid #f0f0f0;text-align:center}
 .modal-body td:first-child{text-align:left;font-weight:600}
+.section-hint{font-size:0.72rem;color:#888;margin:-6px 0 10px;font-style:italic}
 .modal-body tr:last-child td{border-bottom:none}
 tr.game-clickable{cursor:pointer}
 tr.game-clickable:hover td{background:#f5f8ff !important}
@@ -162,6 +166,7 @@ tr.game-clickable:hover td{background:#f5f8ff !important}
 
   <div class="section">
     <h2 data-i18n="games_title">Meccsnapló</h2>
+    <p class="section-hint" data-i18n="games_hint">Kattints egy sorra a meccs részleteiért</p>
     <div class="table-scroll">
       <table id="gameTable">
         <thead><tr id="gameHead"></tr></thead>
@@ -186,7 +191,7 @@ const SCHEDULE   = [];
 const STANDINGS  = null;
 const LAST_GAME  = null;
 const N_GAMES    = 9;
-const GENERATED  = "2026-11-07 19:56";
+const GENERATED  = "2026-11-07 20:33";
 const HAS_IMPACT = true;
 
 // ── i18n ─────────────────────────────────────────────────────────────────────
@@ -197,6 +202,7 @@ const T = {
     leaders_title: "Kategóriavezetők",
     players_title: "Játékosok — PIR szerint rendezve (oszlopra kattintva átrendezhető)",
     games_title:   "Meccsnapló",
+    games_hint:    "Kattints egy sorra a meccs részleteiért",
     record:   "Mérleg",
     games:    "Meccsek",
     pts_for:  "Átlag pont (saját)",
@@ -243,6 +249,7 @@ const T = {
     leaders_title: "Category Leaders",
     players_title: "Player Stats — sorted by PIR (click column to re-sort)",
     games_title:   "Game Log",
+    games_hint:    "Click a row to see match details",
     record:   "Record",
     games:    "Games",
     pts_for:  "Avg Pts For",
@@ -414,7 +421,7 @@ function openBsModal(idx, tr) {
   const bs = GAME_BS[idx] || [];
   const cols = t.bs_cols;
   document.getElementById('bsHead').innerHTML =
-    `<tr>${cols.map(c=>`<th>${c}</th>`).join('')}</tr>`;
+    `<tr>${cols.map((c,i)=>`<th onclick="sortBsModal(${i})">${c}</th>`).join('')}</tr>`;
   document.getElementById('bsBody').innerHTML = bs.length
     ? bs.map(r => `<tr>
         <td>${r.jersey ? '#'+r.jersey+' ' : ''}${r.name}</td>
@@ -429,11 +436,38 @@ function openBsModal(idx, tr) {
       </tr>`).join('')
     : `<tr><td colspan="${cols.length}" style="text-align:center;padding:16px;color:#888">${t.no_bs_data}</td></tr>`;
   document.getElementById('bsModal').classList.add('open');
+  _bsSortCol = 7; _bsSortAsc = false;  // default: PIR desc (col 7)
+  _markBsSort();
 }
 
 function closeBsModal(e) {
   if (e.target === document.getElementById('bsModal'))
     document.getElementById('bsModal').classList.remove('open');
+}
+
+var _bsSortCol = 7, _bsSortAsc = false;
+function _markBsSort() {
+  const ths = document.querySelectorAll('#bsHead th');
+  ths.forEach((th,i) => {
+    th.classList.remove('sort-asc','sort-desc');
+    if (i === _bsSortCol) th.classList.add(_bsSortAsc ? 'sort-asc' : 'sort-desc');
+  });
+}
+function sortBsModal(col) {
+  if (_bsSortCol === col) { _bsSortAsc = !_bsSortAsc; } else { _bsSortCol = col; _bsSortAsc = false; }
+  const tbody = document.getElementById('bsBody');
+  const rows = Array.from(tbody.querySelectorAll('tr'));
+  rows.sort((a, b) => {
+    const av = a.cells[col]?.textContent.trim() || '';
+    const bv = b.cells[col]?.textContent.trim() || '';
+    const an = parseFloat(av.replace('+',''));
+    const bn = parseFloat(bv.replace('+',''));
+    const num = !isNaN(an) && !isNaN(bn);
+    const cmp = num ? an - bn : av.localeCompare(bv);
+    return _bsSortAsc ? cmp : -cmp;
+  });
+  rows.forEach(r => tbody.appendChild(r));
+  _markBsSort();
 }
 
 function renderStandings() {
