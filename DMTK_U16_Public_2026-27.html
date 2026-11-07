@@ -12,6 +12,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
 header{background:#0A1F5C;color:white;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:8px}
 header h1{font-size:1.15rem;font-weight:700;line-height:1.2}
 header .season{color:#F5C400;font-size:0.8rem;margin-top:3px}
+header .subtitle{color:#cdd6f4;font-size:0.75rem;margin-top:2px;font-style:italic}
 #langBtn{background:#F5C400;color:#0A1F5C;border:none;border-radius:6px;padding:8px 14px;font-size:0.85rem;font-weight:700;cursor:pointer;white-space:nowrap;min-height:44px}
 .container{max-width:1100px;margin:0 auto;padding:12px}
 .stats-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
@@ -115,6 +116,7 @@ tr.game-clickable:hover td{background:#f5f8ff !important}
     <div>
     <h1>DMTK U16</h1>
     <div class="season">2026–27</div>
+    
     </div>
   </a>
   <button id="langBtn" onclick="toggleLang()">EN</button>
@@ -206,7 +208,7 @@ const SCHEDULE   = [{"date": "2026-11-08", "time": "12:00", "home": "DMTK", "awa
 const STANDINGS  = {"title": "Leány Kadett — Kiemelt Regionális, Kelet", "source_url": "https://mkosz.hu/utanpotlas/x2627/whunu16/10198", "table": [{"team": "BKG-Veresegyház", "gp": 2, "w": 2, "l": 0, "pf": 127, "pa": 99, "pts": 4}, {"team": "Mezőberényi KK", "gp": 2, "w": 2, "l": 0, "pf": 110, "pa": 92, "pts": 4}, {"team": "Kiss Lenke KS/B", "gp": 3, "w": 2, "l": 1, "pf": 221, "pa": 181, "pts": 5}, {"team": "Dunaharaszti MTK", "gp": 2, "w": 1, "l": 1, "pf": 98, "pa": 109, "pts": 3}, {"team": "FSE Fóti Tigrisek/A", "gp": 2, "w": 0, "l": 2, "pf": 92, "pa": 116, "pts": 2}, {"team": "KS Szeged U16", "gp": 3, "w": 0, "l": 3, "pf": 145, "pa": 196, "pts": 3}]};
 const LAST_GAME  = {"date": "10.20.", "opponent": "Kiss Lenke/B", "score": "50–70", "win": false};
 const N_GAMES    = 4;
-const GENERATED  = "2026-11-07 19:39";
+const GENERATED  = "2026-11-07 19:44";
 const HAS_IMPACT = false;
 
 // ── i18n ─────────────────────────────────────────────────────────────────────
