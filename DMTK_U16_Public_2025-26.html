@@ -191,7 +191,7 @@ const SCHEDULE   = [];
 const STANDINGS  = null;
 const LAST_GAME  = null;
 const N_GAMES    = 20;
-const GENERATED  = "2026-11-10 20:04";
+const GENERATED  = "2026-11-10 20:33";
 const HAS_IMPACT = true;
 
 // ── i18n ─────────────────────────────────────────────────────────────────────
@@ -503,7 +503,9 @@ function renderSchedule() {
   if (!head) return;  // archive dashboards omit the schedule section
   head.innerHTML =
     t.schedule_cols.map(c => `<th>${c}</th>`).join('');
-  document.getElementById('scheduleBody').innerHTML = SCHEDULE.map(r => {
+  const today = new Date().toISOString().slice(0,10);
+  const futureGames = (SCHEDULE || []).filter(r => r.date >= today).sort((a,b) => a.date.localeCompare(b.date));
+  document.getElementById('scheduleBody').innerHTML = futureGames.map(r => {
     const isHome = r.home === 'DMTK';
     const venue  = r.venue || '—';  // U18 schedule entries may have empty venue strings
     const badge  = `<span style="font-size:0.65rem;font-weight:700;padding:1px 5px;border-radius:3px;background:${isHome?'#0A1F5C':'#e0e0e0'};color:${isHome?'white':'#555'}">${isHome ? t.schedule_home : t.schedule_away}</span>`;
