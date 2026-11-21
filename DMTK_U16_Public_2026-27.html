@@ -97,6 +97,8 @@ td.trend-dn{color:#c62828;font-weight:700}
 .modal-body tr:last-child td{border-bottom:none}
 tr.game-clickable{cursor:pointer}
 tr.game-clickable:hover td{background:#f5f8ff !important}
+.career-link{color:inherit;text-decoration:none;border-bottom:1px dotted #2a78d6}
+.career-link:hover{color:#2a78d6}
 </style>
 </head>
 <body>
@@ -112,6 +114,16 @@ tr.game-clickable:hover td{background:#f5f8ff !important}
       <button class="modal-close" onclick="document.getElementById('bsModal').classList.remove('open')">✕</button>
     </div>
     <div class="modal-body"><table id="bsTable"><thead id="bsHead"></thead><tbody id="bsBody"></tbody></table></div>
+  </div>
+</div>
+<!-- Player season stats modal -->
+<div class="modal-overlay" id="playerModal" onclick="closePlayerModal(event)">
+  <div class="modal" style="max-width:520px">
+    <div class="modal-header">
+      <h3 id="playerModalTitle"></h3>
+      <button class="modal-close" onclick="document.getElementById('playerModal').classList.remove('open')">✕</button>
+    </div>
+    <div class="modal-body" id="playerModalBody"></div>
   </div>
 </div>
 <header>
@@ -174,6 +186,16 @@ tr.game-clickable:hover td{background:#f5f8ff !important}
       </table>
     </div>
   </div>
+  <div class="section" id="lineupsSection" style="display:none">
+    <h2 data-i18n="lineups_title">Felállások</h2>
+    <p class="section-hint" data-i18n="lineups_hint">Top 20 felállás az eddigi szezonból, birtok szerint rendezve. Min. 5 birtok.</p>
+    <div class="table-scroll">
+      <table id="lineupsTable">
+        <thead><tr id="lineupsHead"></tr></thead>
+        <tbody id="lineupsBody"></tbody>
+      </table>
+    </div>
+  </div>
 
   <div class="section">
     <h2 data-i18n="standings_title">Tabella</h2>
@@ -206,14 +228,23 @@ tr.game-clickable:hover td{background:#f5f8ff !important}
 // ── Data ─────────────────────────────────────────────────────────────────────
 const HERO       = {"record": "2–5", "games": "7", "pts_for": "55.1", "pts_ag": "69.0", "margin": "-13.9", "streak": "4L", "fg": "41.0%", "efg": "42.9%", "poss_g": "85.4", "ortg": "64.6", "drtg": "80.8"};
 const LEADERS    = [{"hu": "Pont", "en": "Points", "name": "Fanni", "val": "11.7"}, {"hu": "Lepattanó", "en": "Rebounds", "name": "Fanni", "val": "16.1"}, {"hu": "Assziszt", "en": "Assists", "name": "R. Míra", "val": "2.4"}, {"hu": "Labdaszerzés", "en": "Steals", "name": "Fanni", "val": "4.0"}, {"hu": "Blokk", "en": "Blocks", "name": "Fanni", "val": "1.9"}, {"hu": "PIR átl.", "en": "PIR avg", "name": "Fanni", "val": "23.4"}];
-const PLAYER_ROWS= [{"jersey": "23", "display": "Fanni", "top3": true, "cells": ["23", "Fanni", "7", "33.8", "-55", "-7.9", "164", "23.4", "11.7", "16.1", "1.7", "4.0", "1.9", "4.3", "48.0%", "0.0%", "↓-2.0"], "adv": ["23", "Fanni", "13.9", "0.4", "1.09", "21.9%", "60.7", "48.0%", "46.0%", "31.9"]}, {"jersey": "12", "display": "R. Míra", "top3": true, "cells": ["12", "R. Míra", "7", "32.0", "-51", "-7.3", "82", "11.7", "10.4", "6.4", "2.4", "2.7", "1.0", "6.1", "58.0%", "0.0%", "↑+3.9"], "adv": ["12", "R. Míra", "13.1", "0.4", "1.46", "21.1%", "63.2", "58.0%", "57.4%", "25.7"]}, {"jersey": "77", "display": "Zselyke", "top3": true, "cells": ["77", "Zselyke", "7", "30.8", "-27", "-3.9", "42", "6.0", "11.6", "4.6", "1.6", "1.7", "0.4", "5.0", "42.5%", "41.7%", "↓-1.9"], "adv": ["77", "Zselyke", "15.0", "0.3", "1.01", "24.6%", "61.6", "45.6%", "46.3%", "41.6"]}, {"jersey": "40", "display": "Kitti", "top3": false, "cells": ["40", "Kitti", "6", "10.7", "-53", "-8.8", "23", "3.8", "4.7", "1.8", "0.2", "1.3", "0.5", "1.5", "41.7%", "—", "↑+1.0"], "adv": ["40", "Kitti", "17.1", "0.1", "1.17", "27.3%", "61.4", "41.7%", "42.7%", "-21.4"]}, {"jersey": "19", "display": "Nikol", "top3": false, "cells": ["19", "Nikol", "7", "33.1", "-61", "-8.7", "18", "2.6", "8.0", "3.6", "0.7", "2.3", "0.1", "5.1", "30.4%", "22.7%", "↓-1.3"], "adv": ["19", "Nikol", "9.7", "0.1", "0.81", "20.9%", "60.1", "34.1%", "36.4%", "26.0"]}, {"jersey": "2", "display": "Viki", "top3": false, "cells": ["2", "Viki", "7", "21.8", "-28", "-4.0", "9", "1.3", "1.7", "4.0", "1.0", "1.9", "0.1", "4.4", "23.1%", "0.0%", "→"], "adv": ["2", "Viki", "3.1", "0.2", "0.92", "14.3%", "60.6", "23.1%", "31.3%", "20.5"]}, {"jersey": "91", "display": "K. Nóri", "top3": false, "cells": ["91", "K. Nóri", "1", "3.5", "-10", "-10.0", "1", "1.0", "0.0", "1.0", "0.0", "0.0", "0.0", "0.0", "—", "—", "—"], "adv": ["91", "K. Nóri", "0.0", "—", "—", "—", "—", "—", "—", "—"]}, {"jersey": "28", "display": "Miri", "top3": false, "cells": ["28", "Miri", "1", "0.4", "-2", "-0.5", "0", "0.0", "0.0", "0.0", "0.0", "0.0", "0.0", "0.0", "—", "—", "—"], "adv": ["28", "Miri", "0.0", "—", "—", "—", "—", "—", "—", "—"]}, {"jersey": "32", "display": "Petra", "top3": false, "cells": ["32", "Petra", "1", "0.5", "+2", "+0.7", "0", "0.0", "0.0", "0.0", "0.0", "0.0", "0.0", "0.0", "—", "—", "—"], "adv": ["32", "Petra", "0.0", "—", "—", "—", "—", "—", "—", "—"]}, {"jersey": "30", "display": "Enikő", "top3": false, "cells": ["30", "Enikő", "4", "3.3", "-8", "-1.6", "-2", "-0.4", "0.0", "0.5", "0.0", "0.0", "0.0", "1.0", "—", "—", "→"], "adv": ["30", "Enikő", "0.0", "0.0", "—", "—", "—", "—", "—", "—"]}, {"jersey": "10", "display": "Karina", "top3": false, "cells": ["10", "Karina", "1", "5.1", "+2", "+2.0", "-1", "-1.0", "0.0", "1.0", "0.0", "0.0", "0.0", "1.0", "—", "—", "—"], "adv": ["10", "Karina", "0.0", "0.0", "—", "—", "—", "—", "—", "—"]}, {"jersey": "4", "display": "Sára", "top3": false, "cells": ["4", "Sára", "6", "12.0", "-51", "-8.5", "-7", "-1.2", "2.8", "0.8", "0.2", "0.3", "0.5", "2.3", "41.2%", "25.0%", "↑+0.7"], "adv": ["4", "Sára", "9.4", "0.1", "1.00", "20.1%", "60.0", "44.1%", "44.3%", "-24.6"]}, {"jersey": "27", "display": "Eszti", "top3": false, "cells": ["27", "Eszti", "7", "11.4", "-88", "-12.6", "-11", "-1.6", "3.1", "0.3", "0.3", "0.3", "0.0", "2.6", "32.0%", "20.0%", "↓-0.8"], "adv": ["27", "Eszti", "11.0", "0.1", "0.88", "26.4%", "54.5", "34.0%", "38.0%", "-46.0"]}, {"jersey": "21", "display": "Emma", "top3": false, "cells": ["21", "Emma", "2", "4.8", "-23", "-11.5", "-4", "-2.0", "0.5", "0.0", "0.0", "0.0", "0.0", "1.0", "—", "—", "—"], "adv": ["21", "Emma", "4.2", "0.0", "—", "—", "—", "—", "18.9%", "—"]}, {"jersey": "20", "display": "Nadin", "top3": false, "cells": ["20", "Nadin", "5", "17.3", "-42", "-8.4", "-21", "-4.2", "2.8", "1.4", "0.4", "1.0", "0.2", "4.2", "25.0%", "50.0%", "↑+0.9"], "adv": ["20", "Nadin", "6.5", "0.1", "0.70", "21.3%", "47.8", "30.0%", "30.9%", "-11.5"]}];
+const PLAYER_ROWS= [{"jersey": "23", "display": "Fanni", "top3": true, "pgames": [{"date": "09.12.", "opp": "CEKK", "win": true, "pts": 20, "reb": 18, "ast": 3, "fgm": 10, "fga": 14}, {"date": "09.12.", "opp": "Szolnoki sportcentrum", "win": false, "pts": 7, "reb": 16, "ast": 0, "fgm": 3, "fga": 6}, {"date": "10.06.", "opp": "KS Szeged", "win": true, "pts": 18, "reb": 16, "ast": 1, "fgm": 6, "fga": 14}, {"date": "10.20.", "opp": "Kiss Lenke/B", "win": false, "pts": 8, "reb": 18, "ast": 2, "fgm": 3, "fga": 7}, {"date": "11.08.", "opp": "Mezőberényi KK", "win": false, "pts": 5, "reb": 20, "ast": 4, "fgm": 2, "fga": 14}, {"date": "11.10.", "opp": "Fót", "win": false, "pts": 10, "reb": 9, "ast": 2, "fgm": 5, "fga": 7}, {"date": "11.14.", "opp": "BKG V", "win": false, "pts": 14, "reb": 16, "ast": 0, "fgm": 7, "fga": 13}], "cells": ["23", "Fanni", "7", "33.8", "-55", "-7.9", "164", "23.4", "11.7", "16.1", "1.7", "4.0", "1.9", "4.3", "48.0%", "0.0%", "↓-2.0"], "adv": ["23", "Fanni", "13.9", "0.4", "1.09", "21.9%", "60.7", "48.0%", "46.0%", "31.9"]}, {"jersey": "12", "display": "R. Míra", "top3": true, "pgames": [{"date": "09.12.", "opp": "CEKK", "win": true, "pts": 10, "reb": 6, "ast": 4, "fgm": 5, "fga": 9}, {"date": "09.12.", "opp": "Szolnoki sportcentrum", "win": false, "pts": 7, "reb": 7, "ast": 2, "fgm": 2, "fga": 3}, {"date": "10.06.", "opp": "KS Szeged", "win": true, "pts": 7, "reb": 9, "ast": 3, "fgm": 3, "fga": 6}, {"date": "10.20.", "opp": "Kiss Lenke/B", "win": false, "pts": 6, "reb": 5, "ast": 1, "fgm": 3, "fga": 8}, {"date": "11.08.", "opp": "Mezőberényi KK", "win": false, "pts": 16, "reb": 10, "ast": 4, "fgm": 5, "fga": 6}, {"date": "11.10.", "opp": "Fót", "win": false, "pts": 15, "reb": 2, "ast": 1, "fgm": 5, "fga": 8}, {"date": "11.14.", "opp": "BKG V", "win": false, "pts": 12, "reb": 6, "ast": 2, "fgm": 6, "fga": 10}], "cells": ["12", "R. Míra", "7", "32.0", "-51", "-7.3", "82", "11.7", "10.4", "6.4", "2.4", "2.7", "1.0", "6.1", "58.0%", "0.0%", "↑+3.9"], "adv": ["12", "R. Míra", "13.1", "0.4", "1.46", "21.1%", "63.2", "58.0%", "57.4%", "25.7"]}, {"jersey": "77", "display": "Zselyke", "top3": true, "pgames": [{"date": "09.12.", "opp": "CEKK", "win": true, "pts": 21, "reb": 6, "ast": 3, "fgm": 9, "fga": 17}, {"date": "09.12.", "opp": "Szolnoki sportcentrum", "win": false, "pts": 9, "reb": 5, "ast": 0, "fgm": 3, "fga": 5}, {"date": "10.06.", "opp": "KS Szeged", "win": true, "pts": 11, "reb": 6, "ast": 2, "fgm": 4, "fga": 13}, {"date": "10.20.", "opp": "Kiss Lenke/B", "win": false, "pts": 11, "reb": 3, "ast": 1, "fgm": 4, "fga": 10}, {"date": "11.08.", "opp": "Mezőberényi KK", "win": false, "pts": 19, "reb": 4, "ast": 3, "fgm": 9, "fga": 19}, {"date": "11.10.", "opp": "Fót", "win": false, "pts": 8, "reb": 5, "ast": 1, "fgm": 4, "fga": 10}, {"date": "11.14.", "opp": "BKG V", "win": false, "pts": 2, "reb": 3, "ast": 1, "fgm": 1, "fga": 6}], "cells": ["77", "Zselyke", "7", "30.8", "-27", "-3.9", "42", "6.0", "11.6", "4.6", "1.6", "1.7", "0.4", "5.0", "42.5%", "41.7%", "↓-1.9"], "adv": ["77", "Zselyke", "15.0", "0.3", "1.01", "24.6%", "61.6", "45.6%", "46.3%", "41.6"]}, {"jersey": "40", "display": "Kitti", "top3": false, "pgames": [{"date": "09.12.", "opp": "CEKK", "win": true, "pts": 0, "reb": 0, "ast": 0, "fgm": 0, "fga": 0}, {"date": "09.12.", "opp": "Szolnoki sportcentrum", "win": false, "pts": 6, "reb": 4, "ast": 0, "fgm": 2, "fga": 5}, {"date": "10.20.", "opp": "Kiss Lenke/B", "win": false, "pts": 5, "reb": 3, "ast": 0, "fgm": 2, "fga": 3}, {"date": "11.08.", "opp": "Mezőberényi KK", "win": false, "pts": 2, "reb": 0, "ast": 0, "fgm": 1, "fga": 1}, {"date": "11.10.", "opp": "Fót", "win": false, "pts": 13, "reb": 3, "ast": 0, "fgm": 4, "fga": 10}, {"date": "11.14.", "opp": "BKG V", "win": false, "pts": 2, "reb": 1, "ast": 1, "fgm": 1, "fga": 5}], "cells": ["40", "Kitti", "6", "10.7", "-53", "-8.8", "23", "3.8", "4.7", "1.8", "0.2", "1.3", "0.5", "1.5", "41.7%", "—", "↑+1.0"], "adv": ["40", "Kitti", "17.1", "0.1", "1.17", "27.3%", "61.4", "41.7%", "42.7%", "-21.4"]}, {"jersey": "19", "display": "Nikol", "top3": false, "pgames": [{"date": "09.12.", "opp": "CEKK", "win": true, "pts": 10, "reb": 5, "ast": 1, "fgm": 3, "fga": 9}, {"date": "09.12.", "opp": "Szolnoki sportcentrum", "win": false, "pts": 10, "reb": 4, "ast": 0, "fgm": 3, "fga": 5}, {"date": "10.06.", "opp": "KS Szeged", "win": true, "pts": 11, "reb": 5, "ast": 1, "fgm": 5, "fga": 13}, {"date": "10.20.", "opp": "Kiss Lenke/B", "win": false, "pts": 5, "reb": 3, "ast": 1, "fgm": 2, "fga": 9}, {"date": "11.08.", "opp": "Mezőberényi KK", "win": false, "pts": 9, "reb": 1, "ast": 2, "fgm": 4, "fga": 13}, {"date": "11.10.", "opp": "Fót", "win": false, "pts": 5, "reb": 4, "ast": 0, "fgm": 2, "fga": 10}, {"date": "11.14.", "opp": "BKG V", "win": false, "pts": 6, "reb": 3, "ast": 0, "fgm": 2, "fga": 10}], "cells": ["19", "Nikol", "7", "33.1", "-61", "-8.7", "18", "2.6", "8.0", "3.6", "0.7", "2.3", "0.1", "5.1", "30.4%", "22.7%", "↓-1.3"], "adv": ["19", "Nikol", "9.7", "0.1", "0.81", "20.9%", "60.1", "34.1%", "36.4%", "26.0"]}, {"jersey": "2", "display": "Viki", "top3": false, "pgames": [{"date": "09.12.", "opp": "CEKK", "win": true, "pts": 4, "reb": 4, "ast": 3, "fgm": 2, "fga": 6}, {"date": "09.12.", "opp": "Szolnoki sportcentrum", "win": false, "pts": 0, "reb": 0, "ast": 2, "fgm": 0, "fga": 1}, {"date": "10.06.", "opp": "KS Szeged", "win": true, "pts": 1, "reb": 7, "ast": 1, "fgm": 0, "fga": 1}, {"date": "10.20.", "opp": "Kiss Lenke/B", "win": false, "pts": 2, "reb": 5, "ast": 0, "fgm": 1, "fga": 2}, {"date": "11.08.", "opp": "Mezőberényi KK", "win": false, "pts": 3, "reb": 4, "ast": 0, "fgm": 0, "fga": 2}, {"date": "11.10.", "opp": "Fót", "win": false, "pts": 2, "reb": 6, "ast": 0, "fgm": 0, "fga": 0}, {"date": "11.14.", "opp": "BKG V", "win": false, "pts": 0, "reb": 2, "ast": 1, "fgm": 0, "fga": 1}], "cells": ["2", "Viki", "7", "21.8", "-28", "-4.0", "9", "1.3", "1.7", "4.0", "1.0", "1.9", "0.1", "4.4", "23.1%", "0.0%", "→"], "adv": ["2", "Viki", "3.1", "0.2", "0.92", "14.3%", "60.6", "23.1%", "31.3%", "20.5"]}, {"jersey": "91", "display": "K. Nóri", "top3": false, "pgames": [{"date": "09.12.", "opp": "Szolnoki sportcentrum", "win": false, "pts": 0, "reb": 1, "ast": 0, "fgm": 0, "fga": 0}], "cells": ["91", "K. Nóri", "1", "3.5", "-10", "-10.0", "1", "1.0", "0.0", "1.0", "0.0", "0.0", "0.0", "0.0", "—", "—", "—"], "adv": ["91", "K. Nóri", "0.0", "—", "—", "—", "—", "—", "—", "—"]}, {"jersey": "28", "display": "Miri", "top3": false, "pgames": [{"date": "09.12.", "opp": "CEKK", "win": true, "pts": 0, "reb": 0, "ast": 0, "fgm": 0, "fga": 0}], "cells": ["28", "Miri", "1", "0.4", "-2", "-0.5", "0", "0.0", "0.0", "0.0", "0.0", "0.0", "0.0", "0.0", "—", "—", "—"], "adv": ["28", "Miri", "0.0", "—", "—", "—", "—", "—", "—", "—"]}, {"jersey": "32", "display": "Petra", "top3": false, "pgames": [{"date": "10.20.", "opp": "Kiss Lenke/B", "win": false, "pts": 0, "reb": 0, "ast": 0, "fgm": 0, "fga": 0}], "cells": ["32", "Petra", "1", "0.5", "+2", "+0.7", "0", "0.0", "0.0", "0.0", "0.0", "0.0", "0.0", "0.0", "—", "—", "—"], "adv": ["32", "Petra", "0.0", "—", "—", "—", "—", "—", "—", "—"]}, {"jersey": "30", "display": "Enikő", "top3": false, "pgames": [{"date": "09.12.", "opp": "CEKK", "win": true, "pts": 0, "reb": 0, "ast": 0, "fgm": 0, "fga": 0}, {"date": "09.12.", "opp": "Szolnoki sportcentrum", "win": false, "pts": 0, "reb": 1, "ast": 0, "fgm": 0, "fga": 0}, {"date": "10.20.", "opp": "Kiss Lenke/B", "win": false, "pts": 0, "reb": 0, "ast": 0, "fgm": 0, "fga": 0}, {"date": "11.14.", "opp": "BKG V", "win": false, "pts": 0, "reb": 1, "ast": 0, "fgm": 0, "fga": 0}], "cells": ["30", "Enikő", "4", "3.3", "-8", "-1.6", "-2", "-0.4", "0.0", "0.5", "0.0", "0.0", "0.0", "1.0", "—", "—", "→"], "adv": ["30", "Enikő", "0.0", "0.0", "—", "—", "—", "—", "—", "—"]}, {"jersey": "10", "display": "Karina", "top3": false, "pgames": [{"date": "10.20.", "opp": "Kiss Lenke/B", "win": false, "pts": 0, "reb": 1, "ast": 0, "fgm": 0, "fga": 0}], "cells": ["10", "Karina", "1", "5.1", "+2", "+2.0", "-1", "-1.0", "0.0", "1.0", "0.0", "0.0", "0.0", "1.0", "—", "—", "—"], "adv": ["10", "Karina", "0.0", "0.0", "—", "—", "—", "—", "—", "—"]}, {"jersey": "4", "display": "Sára", "top3": false, "pgames": [{"date": "09.12.", "opp": "CEKK", "win": true, "pts": 2, "reb": 1, "ast": 0, "fgm": 1, "fga": 2}, {"date": "09.12.", "opp": "Szolnoki sportcentrum", "win": false, "pts": 4, "reb": 0, "ast": 1, "fgm": 1, "fga": 2}, {"date": "10.06.", "opp": "KS Szeged", "win": true, "pts": 0, "reb": 0, "ast": 0, "fgm": 0, "fga": 2}, {"date": "10.20.", "opp": "Kiss Lenke/B", "win": false, "pts": 4, "reb": 1, "ast": 0, "fgm": 2, "fga": 3}, {"date": "11.10.", "opp": "Fót", "win": false, "pts": 5, "reb": 2, "ast": 0, "fgm": 2, "fga": 4}, {"date": "11.14.", "opp": "BKG V", "win": false, "pts": 2, "reb": 1, "ast": 0, "fgm": 1, "fga": 4}], "cells": ["4", "Sára", "6", "12.0", "-51", "-8.5", "-7", "-1.2", "2.8", "0.8", "0.2", "0.3", "0.5", "2.3", "41.2%", "25.0%", "↑+0.7"], "adv": ["4", "Sára", "9.4", "0.1", "1.00", "20.1%", "60.0", "44.1%", "44.3%", "-24.6"]}, {"jersey": "27", "display": "Eszti", "top3": false, "pgames": [{"date": "09.12.", "opp": "CEKK", "win": true, "pts": 2, "reb": 0, "ast": 0, "fgm": 1, "fga": 2}, {"date": "09.12.", "opp": "Szolnoki sportcentrum", "win": false, "pts": 7, "reb": 1, "ast": 1, "fgm": 2, "fga": 3}, {"date": "10.06.", "opp": "KS Szeged", "win": true, "pts": 0, "reb": 0, "ast": 0, "fgm": 0, "fga": 1}, {"date": "10.20.", "opp": "Kiss Lenke/B", "win": false, "pts": 6, "reb": 1, "ast": 0, "fgm": 3, "fga": 7}, {"date": "11.08.", "opp": "Mezőberényi KK", "win": false, "pts": 3, "reb": 0, "ast": 0, "fgm": 1, "fga": 1}, {"date": "11.10.", "opp": "Fót", "win": false, "pts": 3, "reb": 0, "ast": 0, "fgm": 1, "fga": 4}, {"date": "11.14.", "opp": "BKG V", "win": false, "pts": 1, "reb": 0, "ast": 1, "fgm": 0, "fga": 7}], "cells": ["27", "Eszti", "7", "11.4", "-88", "-12.6", "-11", "-1.6", "3.1", "0.3", "0.3", "0.3", "0.0", "2.6", "32.0%", "20.0%", "↓-0.8"], "adv": ["27", "Eszti", "11.0", "0.1", "0.88", "26.4%", "54.5", "34.0%", "38.0%", "-46.0"]}, {"jersey": "21", "display": "Emma", "top3": false, "pgames": [{"date": "09.12.", "opp": "CEKK", "win": true, "pts": 0, "reb": 0, "ast": 0, "fgm": 0, "fga": 0}, {"date": "09.12.", "opp": "Szolnoki sportcentrum", "win": false, "pts": 1, "reb": 0, "ast": 0, "fgm": 0, "fga": 0}], "cells": ["21", "Emma", "2", "4.8", "-23", "-11.5", "-4", "-2.0", "0.5", "0.0", "0.0", "0.0", "0.0", "1.0", "—", "—", "—"], "adv": ["21", "Emma", "4.2", "0.0", "—", "—", "—", "—", "18.9%", "—"]}, {"jersey": "20", "display": "Nadin", "top3": false, "pgames": [{"date": "10.06.", "opp": "KS Szeged", "win": true, "pts": 0, "reb": 1, "ast": 1, "fgm": 0, "fga": 4}, {"date": "10.20.", "opp": "Kiss Lenke/B", "win": false, "pts": 3, "reb": 0, "ast": 0, "fgm": 1, "fga": 4}, {"date": "11.08.", "opp": "Mezőberényi KK", "win": false, "pts": 2, "reb": 1, "ast": 0, "fgm": 1, "fga": 5}, {"date": "11.10.", "opp": "Fót", "win": false, "pts": 0, "reb": 2, "ast": 1, "fgm": 0, "fga": 0}, {"date": "11.14.", "opp": "BKG V", "win": false, "pts": 9, "reb": 3, "ast": 0, "fgm": 3, "fga": 7}], "cells": ["20", "Nadin", "5", "17.3", "-42", "-8.4", "-21", "-4.2", "2.8", "1.4", "0.4", "1.0", "0.2", "4.2", "25.0%", "50.0%", "↑+0.9"], "adv": ["20", "Nadin", "6.5", "0.1", "0.70", "21.3%", "47.8", "30.0%", "30.9%", "-11.5"]}];
 const GAME_ROWS  = [{"result": "W", "cells": ["1", "09.12.", "CEKK", "69–50", "GY", "52.5%", "50.0%", "33.3%", "14", "25", "40"], "win": true, "idx": 0, "badge": ""}, {"result": "L", "cells": ["2", "09.12.", "Szolnoki sportcentrum", "51–99", "V", "53.3%", "50.0%", "37.0%", "6", "39", "39"], "win": false, "idx": 1, "badge": ""}, {"result": "W", "cells": ["3", "10.06.", "KS Szeged", "48–39", "GY", "33.3%", "42.9%", "47.4%", "9", "35", "44"], "win": true, "idx": 2, "badge": ""}, {"result": "L", "cells": ["4", "10.20.", "Kiss Lenke/B", "50–70", "V", "39.6%", "20.0%", "46.7%", "5", "41", "40"], "win": false, "idx": 3, "badge": ""}, {"result": "L", "cells": ["5", "11.08.", "Mezőberényi KK", "59–70", "V", "37.7%", "20.0%", "50.0%", "13", "19", "40"], "win": false, "idx": 4, "badge": ""}, {"result": "L", "cells": ["6", "11.10.", "Fót", "61–65", "V", "43.4%", "11.1%", "41.2%", "5", "41", "33"], "win": false, "idx": 5, "badge": ""}, {"result": "L", "cells": ["7", "11.14.", "BKG V", "48–90", "V", "33.3%", "18.2%", "40.0%", "6", "44", "36"], "win": false, "idx": 6, "badge": ""}];
 const GAME_BS    = [[{"name": "Zselyke", "jersey": 77, "pts": 21, "reb": 6, "ast": 3, "stl": 3, "blk": 0, "pir": 18, "pm": 20, "tim": "38:30"}, {"name": "Fanni", "jersey": 23, "pts": 20, "reb": 18, "ast": 3, "stl": 4, "blk": 2, "pir": 35, "pm": 26, "tim": "36:22"}, {"name": "R. Míra", "jersey": 12, "pts": 10, "reb": 6, "ast": 4, "stl": 2, "blk": 0, "pir": 11, "pm": 27, "tim": "35:14"}, {"name": "Nikol", "jersey": 19, "pts": 10, "reb": 5, "ast": 1, "stl": 4, "blk": 0, "pir": 11, "pm": 20, "tim": "37:24"}, {"name": "Viki", "jersey": 2, "pts": 4, "reb": 4, "ast": 3, "stl": 2, "blk": 0, "pir": 4, "pm": 13, "tim": "35:04"}, {"name": "Sára", "jersey": 4, "pts": 2, "reb": 1, "ast": 0, "stl": 0, "blk": 0, "pir": 0, "pm": -7, "tim": "4:19"}, {"name": "Eszti", "jersey": 27, "pts": 2, "reb": 0, "ast": 0, "stl": 0, "blk": 0, "pir": 0, "pm": -1, "tim": "8:12"}, {"name": "Kitti", "jersey": 40, "pts": 0, "reb": 0, "ast": 0, "stl": 0, "blk": 0, "pir": 0, "pm": -1, "tim": "1:30"}, {"name": "Miri", "jersey": 28, "pts": 0, "reb": 0, "ast": 0, "stl": 0, "blk": 0, "pir": 0, "pm": 0, "tim": "0:25"}, {"name": "Enikő", "jersey": 30, "pts": 0, "reb": 0, "ast": 0, "stl": 0, "blk": 0, "pir": 0, "pm": -1, "tim": "1:30"}, {"name": "Emma", "jersey": 21, "pts": 0, "reb": 0, "ast": 0, "stl": 0, "blk": 0, "pir": 0, "pm": -1, "tim": "1:30"}], [{"name": "Nikol", "jersey": 19, "pts": 10, "reb": 4, "ast": 0, "stl": 0, "blk": 0, "pir": 10, "pm": -31, "tim": "27:45"}, {"name": "Zselyke", "jersey": 77, "pts": 9, "reb": 5, "ast": 0, "stl": 1, "blk": 0, "pir": 10, "pm": -20, "tim": "22:05"}, {"name": "Fanni", "jersey": 23, "pts": 7, "reb": 16, "ast": 0, "stl": 4, "blk": 2, "pir": 19, "pm": -37, "tim": "31:01"}, {"name": "R. Míra", "jersey": 12, "pts": 7, "reb": 7, "ast": 2, "stl": 3, "blk": 2, "pir": 7, "pm": -39, "tim": "34:38"}, {"name": "Eszti", "jersey": 27, "pts": 7, "reb": 1, "ast": 1, "stl": 0, "blk": 0, "pir": 4, "pm": -31, "tim": "19:34"}, {"name": "Kitti", "jersey": 40, "pts": 6, "reb": 4, "ast": 0, "stl": 3, "blk": 1, "pir": 7, "pm": -33, "tim": "22:44"}, {"name": "Sára", "jersey": 4, "pts": 4, "reb": 0, "ast": 1, "stl": 0, "blk": 2, "pir": -4, "pm": -9, "tim": "13:44"}, {"name": "Emma", "jersey": 21, "pts": 1, "reb": 0, "ast": 0, "stl": 0, "blk": 0, "pir": -4, "pm": -22, "tim": "8:07"}, {"name": "Viki", "jersey": 2, "pts": 0, "reb": 0, "ast": 2, "stl": 0, "blk": 0, "pir": -3, "pm": -3, "tim": "8:56"}, {"name": "K. Nóri", "jersey": 91, "pts": 0, "reb": 1, "ast": 0, "stl": 0, "blk": 0, "pir": 1, "pm": -10, "tim": "3:32"}, {"name": "Enikő", "jersey": 30, "pts": 0, "reb": 1, "ast": 0, "stl": 0, "blk": 0, "pir": -1, "pm": -5, "tim": "7:54"}], [{"name": "Fanni", "jersey": 23, "pts": 18, "reb": 16, "ast": 1, "stl": 3, "blk": 3, "pir": 28, "pm": 14, "tim": "32:53"}, {"name": "Zselyke", "jersey": 77, "pts": 11, "reb": 6, "ast": 2, "stl": 0, "blk": 1, "pir": 2, "pm": 9, "tim": "40:00"}, {"name": "Nikol", "jersey": 19, "pts": 11, "reb": 5, "ast": 1, "stl": 3, "blk": 1, "pir": 6, "pm": 9, "tim": "37:17"}, {"name": "R. Míra", "jersey": 12, "pts": 7, "reb": 9, "ast": 3, "stl": 4, "blk": 1, "pir": 10, "pm": 6, "tim": "32:19"}, {"name": "Viki", "jersey": 2, "pts": 1, "reb": 7, "ast": 1, "stl": 4, "blk": 1, "pir": 5, "pm": 9, "tim": "30:07"}, {"name": "Sára", "jersey": 4, "pts": 0, "reb": 0, "ast": 0, "stl": 1, "blk": 0, "pir": -1, "pm": -5, "tim": "7:41"}, {"name": "Eszti", "jersey": 27, "pts": 0, "reb": 0, "ast": 0, "stl": 0, "blk": 0, "pir": -1, "pm": 1, "tim": "4:02"}, {"name": "Nadin", "jersey": 20, "pts": 0, "reb": 1, "ast": 1, "stl": 0, "blk": 1, "pir": -9, "pm": 2, "tim": "15:41"}], [{"name": "Zselyke", "jersey": 77, "pts": 11, "reb": 3, "ast": 1, "stl": 2, "blk": 0, "pir": 7, "pm": -16, "tim": "30:51"}, {"name": "Fanni", "jersey": 23, "pts": 8, "reb": 18, "ast": 2, "stl": 6, "blk": 0, "pir": 19, "pm": -13, "tim": "29:45"}, {"name": "R. Míra", "jersey": 12, "pts": 6, "reb": 5, "ast": 1, "stl": 1, "blk": 1, "pir": 0, "pm": -13, "tim": "30:21"}, {"name": "Eszti", "jersey": 27, "pts": 6, "reb": 1, "ast": 0, "stl": 0, "blk": 0, "pir": -2, "pm": -21, "tim": "13:25"}, {"name": "Kitti", "jersey": 40, "pts": 5, "reb": 3, "ast": 0, "stl": 0, "blk": 1, "pir": 7, "pm": -7, "tim": "8:41"}, {"name": "Nikol", "jersey": 19, "pts": 5, "reb": 3, "ast": 1, "stl": 1, "blk": 0, "pir": -3, "pm": -8, "tim": "26:18"}, {"name": "Sára", "jersey": 4, "pts": 4, "reb": 1, "ast": 0, "stl": 1, "blk": 1, "pir": 1, "pm": -16, "tim": "14:31"}, {"name": "Nadin", "jersey": 20, "pts": 3, "reb": 0, "ast": 0, "stl": 2, "blk": 0, "pir": -9, "pm": -6, "tim": "19:42"}, {"name": "Viki", "jersey": 2, "pts": 2, "reb": 5, "ast": 0, "stl": 1, "blk": 0, "pir": 5, "pm": -14, "tim": "16:17"}, {"name": "Miri", "jersey": 28, "pts": 0, "reb": 0, "ast": 0, "stl": 0, "blk": 0, "pir": 0, "pm": -2, "tim": "1:08"}, {"name": "Petra", "jersey": 32, "pts": 0, "reb": 0, "ast": 0, "stl": 0, "blk": 0, "pir": 0, "pm": 2, "tim": "1:27"}, {"name": "Enikő", "jersey": 30, "pts": 0, "reb": 0, "ast": 0, "stl": 0, "blk": 0, "pir": -1, "pm": 2, "tim": "2:28"}, {"name": "Karina", "jersey": 10, "pts": 0, "reb": 1, "ast": 0, "stl": 0, "blk": 0, "pir": -1, "pm": 2, "tim": "5:06"}], [{"name": "Zselyke", "jersey": 77, "pts": 19, "reb": 4, "ast": 3, "stl": 3, "blk": 1, "pir": 12, "pm": -4, "tim": "37:04"}, {"name": "R. Míra", "jersey": 12, "pts": 16, "reb": 10, "ast": 4, "stl": 2, "blk": 3, "pir": 35, "pm": -11, "tim": "40:00"}, {"name": "Nikol", "jersey": 19, "pts": 9, "reb": 1, "ast": 2, "stl": 3, "blk": 0, "pir": 2, "pm": -12, "tim": "37:25"}, {"name": "Fanni", "jersey": 23, "pts": 5, "reb": 20, "ast": 4, "stl": 4, "blk": 1, "pir": 19, "pm": -6, "tim": "37:39"}, {"name": "Viki", "jersey": 2, "pts": 3, "reb": 4, "ast": 0, "stl": 3, "blk": 0, "pir": 4, "pm": -3, "tim": "22:20"}, {"name": "Eszti", "jersey": 27, "pts": 3, "reb": 0, "ast": 0, "stl": 0, "blk": 0, "pir": 2, "pm": -1, "tim": "8:50"}, {"name": "Kitti", "jersey": 40, "pts": 2, "reb": 0, "ast": 0, "stl": 0, "blk": 0, "pir": 1, "pm": -5, "tim": "2:30"}, {"name": "Nadin", "jersey": 20, "pts": 2, "reb": 1, "ast": 0, "stl": 1, "blk": 0, "pir": -2, "pm": -13, "tim": "14:12"}], [{"name": "R. Míra", "jersey": 12, "pts": 15, "reb": 2, "ast": 1, "stl": 3, "blk": 0, "pir": 13, "pm": 5, "tim": "22:54"}, {"name": "Kitti", "jersey": 40, "pts": 13, "reb": 3, "ast": 0, "stl": 2, "blk": 0, "pir": 6, "pm": 3, "tim": "17:47"}, {"name": "Fanni", "jersey": 23, "pts": 10, "reb": 9, "ast": 2, "stl": 3, "blk": 4, "pir": 22, "pm": -3, "tim": "33:31"}, {"name": "Zselyke", "jersey": 77, "pts": 8, "reb": 5, "ast": 1, "stl": 1, "blk": 1, "pir": -1, "pm": -1, "tim": "33:09"}, {"name": "Nikol", "jersey": 19, "pts": 5, "reb": 4, "ast": 0, "stl": 3, "blk": 0, "pir": -2, "pm": -4, "tim": "36:11"}, {"name": "Sára", "jersey": 4, "pts": 5, "reb": 2, "ast": 0, "stl": 0, "blk": 0, "pir": 1, "pm": 4, "tim": "16:48"}, {"name": "Eszti", "jersey": 27, "pts": 3, "reb": 0, "ast": 0, "stl": 0, "blk": 0, "pir": -8, "pm": -11, "tim": "8:46"}, {"name": "Viki", "jersey": 2, "pts": 2, "reb": 6, "ast": 0, "stl": 1, "blk": 0, "pir": -3, "pm": -6, "tim": "20:40"}, {"name": "Miri", "jersey": 28, "pts": 0, "reb": 0, "ast": 0, "stl": 0, "blk": 0, "pir": 0, "pm": 0, "tim": ""}, {"name": "Petra", "jersey": 32, "pts": 0, "reb": 0, "ast": 0, "stl": 0, "blk": 0, "pir": 0, "pm": 0, "tim": ""}, {"name": "Enikő", "jersey": 30, "pts": 0, "reb": 0, "ast": 0, "stl": 0, "blk": 0, "pir": 0, "pm": 0, "tim": ""}, {"name": "Nadin", "jersey": 20, "pts": 0, "reb": 2, "ast": 1, "stl": 0, "blk": 0, "pir": -3, "pm": -7, "tim": "10:14"}], [{"name": "Fanni", "jersey": 23, "pts": 14, "reb": 16, "ast": 0, "stl": 4, "blk": 1, "pir": 22, "pm": -36, "tim": "35:08"}, {"name": "R. Míra", "jersey": 12, "pts": 12, "reb": 6, "ast": 2, "stl": 4, "blk": 0, "pir": 6, "pm": -26, "tim": "28:15"}, {"name": "Nadin", "jersey": 20, "pts": 9, "reb": 3, "ast": 0, "stl": 2, "blk": 0, "pir": 2, "pm": -18, "tim": "26:55"}, {"name": "Nikol", "jersey": 19, "pts": 6, "reb": 3, "ast": 0, "stl": 2, "blk": 0, "pir": -6, "pm": -35, "tim": "29:08"}, {"name": "Zselyke", "jersey": 77, "pts": 2, "reb": 3, "ast": 1, "stl": 2, "blk": 0, "pir": -6, "pm": -15, "tim": "13:46"}, {"name": "Kitti", "jersey": 40, "pts": 2, "reb": 1, "ast": 1, "stl": 3, "blk": 1, "pir": 2, "pm": -10, "tim": "11:16"}, {"name": "Sára", "jersey": 4, "pts": 2, "reb": 1, "ast": 0, "stl": 0, "blk": 0, "pir": -4, "pm": -18, "tim": "14:58"}, {"name": "Eszti", "jersey": 27, "pts": 1, "reb": 0, "ast": 1, "stl": 2, "blk": 0, "pir": -6, "pm": -24, "tim": "16:52"}, {"name": "Viki", "jersey": 2, "pts": 0, "reb": 2, "ast": 1, "stl": 2, "blk": 0, "pir": -3, "pm": -24, "tim": "19:06"}, {"name": "Miri", "jersey": 28, "pts": 0, "reb": 0, "ast": 0, "stl": 0, "blk": 0, "pir": 0, "pm": 0, "tim": ""}, {"name": "Petra", "jersey": 32, "pts": 0, "reb": 0, "ast": 0, "stl": 0, "blk": 0, "pir": 0, "pm": 0, "tim": ""}, {"name": "Enikő", "jersey": 30, "pts": 0, "reb": 1, "ast": 0, "stl": 0, "blk": 0, "pir": 0, "pm": -4, "tim": "4:36"}]];
+// Career card slugs (players with an individual stat card)
+const CAREER_SLUGS = new Set(["eszti", "fanni", "kitti", "nadin", "nikol", "r_mira", "sara", "viki", "zselyke"]);
+function careerSlug(name) {
+  return name.toLowerCase()
+    .replace(/[áàâä]/g,'a').replace(/[éèêë]/g,'e').replace(/[íìîï]/g,'i')
+    .replace(/[óòôöő]/g,'o').replace(/[úùûüű]/g,'u')
+    .replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'');
+}
 const SCHEDULE   = [{"date": "2026-11-08", "time": "12:00", "home": "DMTK", "away": "Mezőberényi KK", "venue": "Kőrösi Csoma Sándor Ált. Isk. Tornaterme"}, {"date": "2026-11-10", "time": "18:00", "home": "DMTK", "away": "FSE Fóti Tigrisek/A", "venue": "Kőrösi Csoma Sándor Ált. Isk. Tornaterme"}, {"date": "2026-11-14", "time": "11:00", "home": "BKG-Veresegyház", "away": "DMTK", "venue": "Veresegyházi Kosárlabda Csarnok"}, {"date": "2026-11-21", "time": "11:00", "home": "KS Szeged U16", "away": "DMTK", "venue": "Városi Sportcsarnok"}, {"date": "2026-11-28", "time": "11:00", "home": "DMTK", "away": "Kiss Lenke KS/B", "venue": "Kőrösi Csoma Sándor Ált. Isk. Tornaterme"}, {"date": "2026-12-05", "time": "11:00", "home": "FSE Fóti Tigrisek/A", "away": "DMTK", "venue": "Bajza József Ált. Isk. Tornacsarnoka"}, {"date": "2026-12-11", "time": "15:30", "home": "Mezőberényi KK", "away": "DMTK", "venue": "Molnár Miklós Sportcsarnok"}, {"date": "2026-12-15", "time": "18:00", "home": "DMTK", "away": "BKG-Veresegyház", "venue": "Kőrösi Csoma Sándor Ált. Isk. Tornaterme"}];
 const STANDINGS  = {"title": "Leány Kadett — Kiemelt Regionális, Kelet", "source_url": "https://mkosz.hu/utanpotlas/x2627/whunu16/10198", "table": [{"team": "BKG-Veresegyház", "gp": 5, "w": 5, "l": 0, "pf": 411, "pa": 251, "pts": 10}, {"team": "Mezőberényi KK", "gp": 5, "w": 5, "l": 0, "pf": 339, "pa": 269, "pts": 10}, {"team": "FSE Fóti Tigrisek/A", "gp": 5, "w": 2, "l": 3, "pf": 302, "pa": 282, "pts": 7}, {"team": "Kiss Lenke KS/B", "gp": 5, "w": 2, "l": 3, "pf": 326, "pa": 369, "pts": 7}, {"team": "Dunaharaszti MTK", "gp": 5, "w": 1, "l": 4, "pf": 266, "pa": 334, "pts": 6}, {"team": "KS Szeged U16", "gp": 5, "w": 0, "l": 5, "pf": 229, "pa": 368, "pts": 5}]};
 const LAST_GAME  = {"date": "11.14.", "opponent": "BKG V", "score": "48–90", "win": false};
+const LINEUPS    = [];
 const N_GAMES    = 7;
-const GENERATED  = "2026-11-21 18:16";
+const GENERATED  = "2026-11-21 18:18";
 const HAS_IMPACT = true;
 
 // ── i18n ─────────────────────────────────────────────────────────────────────
@@ -243,7 +274,7 @@ const T = {
     game_cols:   ["#","Dátum","Ellenfél","Eredmény","GY/V","FG%","3P%","FT%","Asz.","TO","Lep."],
     bs_cols:  ["Játékos","Idő","Pont","Lep.","Asz.","LSz.","Blk","PIR","+/-"],
     no_bs_data: "Nincs adatrész ehhez a meccshez.",
-    fn_pir: "A táblázat <b>PIR</b> (Performance Index Rating) szerint van rendezve — ez az európai kosárlabda hivatalos összesített teljesítménymutatója. Minden pozitív dolog hozzáadódik (pont, lepattanó, assziszt, labdaszerzés, blokk), minden negatív levonódik (elveszített labda, rontott kísérlet, büntetőhiba). Minél magasabb, annál többet adott hozzá a játékos a meccshez.",
+    fn_pir: "A táblázat <b>PIR</b> (Performance Index Rating) szerint van rendezve — ez az európai kosárlabda hivatalos összesített teljesítménymutatója. Minden pozitív dolog hozzáadódik (pont, lepattanó, assziszt, labdaszerzés, blokk), minden negatív levonódik (elveszített labda, rontott kísérlet, büntetőhiba). Minél magasabb, annál többet adott hozzá a játékos a meccshez.<br><br>Az aláhúzott nevek egyéni statisztika-kártyára mutatnak (minimum 5 meccs szükséges).",
     fn_pm: "A +/− torzíthat kis mintán.",
     generated: "Generálva:",
     dmtk_label: "DMTK",
@@ -259,6 +290,9 @@ const T = {
     standings_cols: ["#","Csapat","M","GY","V","+/-","Pont"],
     standings_note: "A CEKK és Szolnoki elleni mérkőzések selejtező mérkőzések voltak, nem számítanak a bajnoki tabellába.",
     standings_src: "Forrás: mkosz.hu",
+    lineups_title: "Felállások",
+    lineups_hint: "Top 20 felállás az eddigi szezonból, birtok szerint rendezve. Min. 5 birtok.",
+    lineups_cols: ["Játékos 1","Játékos 2","Játékos 3","Játékos 4","Játékos 5","Birtok","Pont","Ellen","ORtg","DRtg","Net"],
     last_game_label: "Legutóbbi meccs",
     next_game_label: "Következő mérkőzés",
     next_home: "Otthon",
@@ -290,7 +324,7 @@ const T = {
     game_cols:   ["#","Date","Opponent","Score","W/L","FG%","3P%","FT%","AST","TO","REB"],
     bs_cols:  ["Player","Time","PTS","REB","AST","STL","BLK","PIR","+/-"],
     no_bs_data: "No box score data for this game.",
-    fn_pir: "The table is sorted by <b>PIR</b> (Performance Index Rating) — European basketball's official all-round performance stat. Everything positive adds up (points, rebounds, assists, steals, blocks) and everything negative is subtracted (turnovers, missed shots, fouls). The higher the number, the more the player contributed to the game.",
+    fn_pir: "The table is sorted by <b>PIR</b> (Performance Index Rating) — European basketball's official all-round performance stat. Everything positive adds up (points, rebounds, assists, steals, blocks) and everything negative is subtracted (turnovers, missed shots, fouls). The higher the number, the more the player contributed to the game.<br><br>Underlined names link to an individual stat card (minimum 5 games required).",
     fn_pm: "+/− can be skewed over a small sample.",
     generated: "Generated:",
     dmtk_label: "DMTK",
@@ -306,6 +340,9 @@ const T = {
     standings_cols: ["#","Team","GP","W","L","+/-","Pts"],
     standings_note: "The CEKK and Szolnoki games were qualifying fixtures and don't count toward the league standings.",
     standings_src: "Source: mkosz.hu",
+    lineups_title: "Lineups",
+    lineups_hint: "Top 20 lineups this season, sorted by possessions. Min. 5 possessions.",
+    lineups_cols: ["Player 1","Player 2","Player 3","Player 4","Player 5","Poss","Pts","Opp","ORtg","DRtg","Net"],
     last_game_label: "Last Game",
     next_game_label: "Next Game",
     next_home: "Home",
@@ -383,13 +420,26 @@ function renderPlayerTable() {
   document.getElementById('playerHead').innerHTML = cols.map((c,i) =>
     `<th class="sortable" onclick="sortTable('player',${i})">${c}</th>`
   ).join('');
-  document.getElementById('playerBody').innerHTML = PLAYER_ROWS.map(r => {
+  document.getElementById('playerBody').innerHTML = PLAYER_ROWS.map((r, rowIdx) => {
     const cls = r.top3 ? 'top3' : '';
+    const slug = careerSlug(r.display);
+    const hasCard = CAREER_SLUGS.has(slug);
+    const teamKey = "u16";
     const cells = r.cells.map((c,i) => {
       // Last column is trend — color it based on arrow direction
       if (i === r.cells.length - 1) {
         const tc = c.startsWith('↑') ? 'trend-up' : c.startsWith('↓') ? 'trend-dn' : '';
         return `<td class="${tc}" title="${T[lang].trend_tip}">${c}</td>`;
+      }
+      // Name cell: career link (if eligible) + season stats button
+      if (i === 1) {
+        const nameHtml = hasCard
+          ? `<a href="career_${slug}_${teamKey}.html" target="_blank" class="career-link">${c}</a>`
+          : c;
+        const btn = r.pgames && r.pgames.length > 0
+          ? ` <button onclick="openPlayerModal(${rowIdx})" style="font-size:0.65rem;padding:1px 5px;border:1px solid #aac4e8;border-radius:3px;background:#f0f6ff;color:#1a4a9a;cursor:pointer;vertical-align:middle;margin-left:3px">${lang==='hu'?'Szezon stats':'Season stats'}</button>`
+          : '';
+        return `<td>${nameHtml}${btn}</td>`;
       }
       return `<td>${c}</td>`;
     });
@@ -399,9 +449,23 @@ function renderPlayerTable() {
   document.getElementById('playerAdvHead').innerHTML = acols.map((c,i) =>
     `<th class="sortable" onclick="sortTable('playerAdv',${i})">${c}</th>`
   ).join('');
-  document.getElementById('playerAdvBody').innerHTML = PLAYER_ROWS.map(r => {
+  document.getElementById('playerAdvBody').innerHTML = PLAYER_ROWS.map((r, rowIdx) => {
     const cls = r.top3 ? 'top3' : '';
-    return `<tr class="${cls}">${r.adv.map(c=>`<td>${c}</td>`).join('')}</tr>`;
+    const slug = careerSlug(r.display);
+    const hasCard = CAREER_SLUGS.has(slug);
+    const teamKey = "u16";
+    return `<tr class="${cls}">${r.adv.map((c,i) => {
+      if (i === 1) {
+        const nameHtml = hasCard
+          ? `<a href="career_${slug}_${teamKey}.html" target="_blank" class="career-link">${c}</a>`
+          : c;
+        const btn = r.pgames && r.pgames.length > 0
+          ? ` <button onclick="openPlayerModal(${rowIdx})" style="font-size:0.65rem;padding:1px 5px;border:1px solid #aac4e8;border-radius:3px;background:#f0f6ff;color:#1a4a9a;cursor:pointer;vertical-align:middle;margin-left:3px">${lang==='hu'?'Szezon stats':'Season stats'}</button>`
+          : '';
+        return `<td>${nameHtml}${btn}</td>`;
+      }
+      return `<td>${c}</td>`;
+    }).join('')}</tr>`;
   }).join('');
   document.getElementById('fnPlayers').innerHTML = t.fn_pir;
   document.getElementById('fnPM').innerHTML      = t.fn_pm;
@@ -465,6 +529,80 @@ function openBsModal(idx, tr) {
 function closeBsModal(e) {
   if (e.target === document.getElementById('bsModal'))
     document.getElementById('bsModal').classList.remove('open');
+}
+
+function openPlayerModal(rowIdx) {
+  const r = PLAYER_ROWS[rowIdx];
+  if (!r || !r.pgames || r.pgames.length === 0) return;
+  document.getElementById('playerModalTitle').textContent = r.display;
+  const body = document.getElementById('playerModalBody');
+
+  // SVG sparkline
+  const W = 460, H = 100, PAD = {l:28, r:8, t:12, b:20};
+  const ptsArr = r.pgames.map(g => g.pts);
+  const maxPts = Math.max(...ptsArr, 1);
+  const xStep  = (W - PAD.l - PAD.r) / Math.max(r.pgames.length - 1, 1);
+  const yScale = v => PAD.t + (H - PAD.t - PAD.b) * (1 - v / (maxPts * 1.1));
+  const xPos   = i => PAD.l + i * xStep;
+
+  const polyPts = r.pgames.map((g, i) => `${xPos(i).toFixed(1)},${yScale(g.pts).toFixed(1)}`).join(' ');
+  const gridLines = [0, Math.round(maxPts/2), maxPts].map(v =>
+    `<line x1="${PAD.l}" y1="${yScale(v).toFixed(1)}" x2="${W-PAD.r}" y2="${yScale(v).toFixed(1)}" stroke="#e0e0e0" stroke-width="1"/>
+     <text x="${PAD.l-4}" y="${(yScale(v)+4).toFixed(1)}" font-size="9" fill="#999" text-anchor="end">${v}</text>`).join('');
+  const dots = r.pgames.map((g, i) =>
+    `<circle cx="${xPos(i).toFixed(1)}" cy="${yScale(g.pts).toFixed(1)}" r="5"
+      fill="${g.win ? '#1a6bbf' : '#e57c00'}" stroke="white" stroke-width="2">
+      <title>${g.opp} (${g.win?'W':'L'}) — ${g.pts}pts</title></circle>`).join('');
+  const dateLabels = r.pgames.length <= 10 ? r.pgames.map((g, i) =>
+    `<text x="${xPos(i).toFixed(1)}" y="${H-3}" font-size="8" fill="#888" text-anchor="middle">${g.date}</text>`).join('') : '';
+
+  const svg = `<svg width="100%" viewBox="0 0 ${W} ${H}" style="display:block;margin-bottom:12px">
+    ${gridLines}
+    ${r.pgames.length > 1 ? `<polyline points="${polyPts}" fill="none" stroke="#bbb" stroke-width="1.5"/>` : ''}
+    ${dots}
+    ${dateLabels}
+    <text x="${PAD.l-4}" y="${PAD.t-2}" font-size="8" fill="#aaa" text-anchor="end">pts</text>
+  </svg>`;
+
+  // Legend
+  const legend = `<div style="font-size:0.7rem;color:#666;margin-bottom:10px">
+    <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#1a6bbf;margin-right:4px"></span>W&nbsp;&nbsp;
+    <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#e57c00;margin-right:4px"></span>L
+  </div>`;
+
+  // Per-game table
+  const tRows = r.pgames.map(g => {
+    const fgPct = g.fga > 0 ? (100*g.fgm/g.fga).toFixed(0)+'%' : '—';
+    const bord = g.win ? 'border-left:3px solid #2a7a2a' : 'border-left:3px solid #c62828';
+    return `<tr style="${bord}">
+      <td style="padding-left:6px">${g.date}</td>
+      <td>${g.opp}</td>
+      <td style="text-align:right"><b>${g.pts}</b></td>
+      <td style="text-align:right">${g.reb}</td>
+      <td style="text-align:right">${g.ast}</td>
+      <td style="text-align:right">${fgPct}</td>
+    </tr>`;
+  }).join('');
+
+  body.innerHTML = svg + legend +
+    `<table style="width:100%;border-collapse:collapse;font-size:0.78rem">
+      <thead><tr style="background:#f0f4ff">
+        <th style="text-align:left;padding:4px 2px">Dátum</th>
+        <th style="text-align:left">Ellenfél</th>
+        <th style="text-align:right">Pont</th>
+        <th style="text-align:right">Lep.</th>
+        <th style="text-align:right">Asz.</th>
+        <th style="text-align:right">MK%</th>
+      </tr></thead>
+      <tbody>${tRows}</tbody>
+    </table>`;
+
+  document.getElementById('playerModal').classList.add('open');
+}
+
+function closePlayerModal(e) {
+  if (e.target === document.getElementById('playerModal'))
+    document.getElementById('playerModal').classList.remove('open');
 }
 
 var _bsSortCol = 7, _bsSortAsc = false;
@@ -538,6 +676,34 @@ function renderSchedule() {
   document.getElementById('scheduleSrc').textContent = t.schedule_src;
 }
 
+function renderLineups() {
+  const sec  = document.getElementById('lineupsSection');
+  const head = document.getElementById('lineupsHead');
+  const body = document.getElementById('lineupsBody');
+  if (!head || !LINEUPS || LINEUPS.length === 0) return;
+  sec.style.display = '';
+  const t = T[lang];
+  head.innerHTML = t.lineups_cols.map(c => `<th style="white-space:nowrap">${c}</th>`).join('');
+  const fmtRtg = v => v == null ? '—' : v.toFixed(1);
+  const netColor = v => v == null ? '' : v > 0 ? 'color:#2a7a2a' : v < 0 ? 'color:#c62828' : '';
+  body.innerHTML = LINEUPS
+    .filter(lu => lu.possessions >= 5)
+    .map(lu => {
+      const p = lu.players;
+      const net = lu.net_rating;
+      return `<tr>
+        ${p.map(n => `<td style="white-space:nowrap">${n}</td>`).join('')}
+        ${Array(Math.max(0, 5 - p.length)).fill('<td>—</td>').join('')}
+        <td style="text-align:right">${lu.possessions}</td>
+        <td style="text-align:right">${lu.pts_for}</td>
+        <td style="text-align:right">${lu.pts_allowed}</td>
+        <td style="text-align:right">${fmtRtg(lu.ortg)}</td>
+        <td style="text-align:right">${fmtRtg(lu.drtg)}</td>
+        <td style="text-align:right;font-weight:600;${netColor(net)}">${fmtRtg(net)}</td>
+      </tr>`;
+    }).join('');
+}
+
 function renderAll() {
   document.getElementById('langBtn').textContent = T[lang].lang_toggle;
   document.querySelectorAll('[data-i18n]').forEach(el => {
@@ -552,6 +718,7 @@ function renderAll() {
   renderGameTable();
   renderStandings();
   renderSchedule();
+  renderLineups();
   document.getElementById('generated').textContent = T[lang].generated + ' ' + GENERATED;
   renderChart();
 }
