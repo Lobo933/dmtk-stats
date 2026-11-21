@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kitti – U16 2026–27 | DMTK</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
+  background:#f9f9f7;
+  color:#0b0b0b;
+  padding:16px;
+  min-height:100vh;
+}
+.card{
+  background:#fcfcfb;
+  border:1px solid #e1e0d9;
+  border-radius:8px;
+  padding:20px 24px;
+  max-width:820px;
+  margin:0 auto;
+}
+.hdr-title{font-size:1.4rem;font-weight:700;line-height:1.3;color:#0b0b0b}
+.hdr-sub{font-size:0.85rem;color:#52514e;margin-top:4px}
+.kpi-row{
+  display:flex;gap:10px;flex-wrap:wrap;margin:20px 0;
+}
+.kpi{
+  background:#fcfcfb;
+  border:1px solid #e1e0d9;
+  border-radius:8px;
+  padding:12px 16px;
+  text-align:center;
+  flex:1 1 90px;
+  min-width:80px;
+}
+.kpi-lbl{
+  font-size:0.7rem;color:#898781;
+  text-transform:uppercase;letter-spacing:0.06em;
+  margin-bottom:5px;
+}
+.kpi-val{font-size:1.8rem;font-weight:600;color:#0b0b0b;line-height:1}
+.chart-wrap{
+  margin:0 0 20px;
+  position:relative;
+}
+.chart-title{
+  font-size:0.75rem;color:#52514e;font-weight:600;
+  margin-bottom:6px;text-transform:uppercase;letter-spacing:0.05em;
+}
+.chart-legend{
+  font-size:0.7rem;color:#898781;margin-top:4px;
+}
+.chart-legend .dot-w{color:#2a78d6}
+.chart-legend .dot-l{color:#eb6834}
+svg.pts-chart{
+  width:100%;height:160px;display:block;overflow:visible;
+}
+.tooltip{
+  position:absolute;
+  background:rgba(10,10,10,0.88);
+  color:#fff;
+  font-size:0.72rem;
+  padding:5px 8px;
+  border-radius:5px;
+  pointer-events:none;
+  opacity:0;
+  transition:opacity 0.12s;
+  white-space:nowrap;
+  z-index:10;
+}
+.section-title{
+  font-size:0.75rem;font-weight:700;color:#1a2e6c;
+  text-transform:uppercase;letter-spacing:0.06em;
+  border-bottom:2px solid #e1e0d9;padding-bottom:5px;
+  margin-bottom:10px;
+}
+.table-wrap{overflow-x:auto}
+table{
+  width:100%;border-collapse:collapse;font-size:0.82rem;
+}
+th{
+  background:#1a2e6c;color:#fff;
+  padding:7px 8px;text-align:left;
+  font-size:0.72rem;font-weight:600;letter-spacing:0.03em;
+  white-space:nowrap;
+}
+td{
+  padding:6px 8px;border-bottom:1px solid #e1e0d9;
+  white-space:nowrap;
+}
+tr:nth-child(even) td{background:#f4f4f2}
+.border-w{border-left:3px solid #2e7d32!important}
+.border-l{border-left:3px solid #c62828!important}
+.gy{color:#2e7d32;font-weight:600}
+.ve{color:#c62828;font-weight:600}
+.footer{
+  margin-top:20px;font-size:0.7rem;color:#898781;
+  text-align:right;
+}
+@media(max-width:480px){
+  .card{padding:14px 12px}
+  .kpi-val{font-size:1.4rem}
+}
+@media(prefers-color-scheme:dark){
+  body{background:#1a1a19;color:#f0efec}
+  .card{background:#252523;border-color:#2c2c2a}
+  .hdr-title{color:#f0efec}
+  .hdr-sub{color:#c3c2b7}
+  .kpi{background:#252523;border-color:#2c2c2a}
+  .kpi-lbl{color:#898781}
+  .kpi-val{color:#f0efec}
+  .chart-title{color:#c3c2b7}
+  .chart-legend{color:#898781}
+  .section-title{color:#7b9fd4;border-bottom-color:#2c2c2a}
+  th{background:#2a3f8c}
+  td{border-color:#2c2c2a}
+  tr:nth-child(even) td{background:#1e1e1d}
+  .footer{color:#52514e}
+  .tooltip{background:rgba(240,239,236,0.92);color:#0b0b0b}
+}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="hdr-title" id="hdrTitle">#40 Kitti · U16 · 2026–27</div>
+  <div class="hdr-sub" id="hdrSub">6 mérkőzés</div>
+
+  <div class="kpi-row" id="kpiRow">
+    <div class="kpi"><div class="kpi-lbl">PPG</div><div class="kpi-val" id="kpiPpg">—</div></div>
+    <div class="kpi"><div class="kpi-lbl">RPG</div><div class="kpi-val" id="kpiRpg">—</div></div>
+    <div class="kpi"><div class="kpi-lbl">APG</div><div class="kpi-val" id="kpiApg">—</div></div>
+    <div class="kpi"><div class="kpi-lbl">FG%</div><div class="kpi-val" id="kpiFg">—</div></div>
+    <div class="kpi"><div class="kpi-lbl">PIR/G</div><div class="kpi-val" id="kpiPir">—</div></div>
+  </div>
+
+  <div class="chart-wrap">
+    <div class="chart-title">Pontok mérkőzésenként</div>
+    <svg class="pts-chart" id="ptsChart"></svg>
+    <div class="chart-legend">
+      <span class="dot-w">●</span> Győzelem &nbsp;
+      <span class="dot-l">●</span> Vereség
+    </div>
+  </div>
+  <div class="tooltip" id="tip"></div>
+
+  <div class="section-title">Mérkőzésnaplő</div>
+  <div class="table-wrap">
+    <table id="logTable">
+      <thead>
+        <tr>
+          <th>Dátum</th><th>Ellenfél</th><th>E/V</th><th>Min</th>
+          <th>Pts</th><th>Reb</th><th>Ast</th><th>FG%</th><th>PIR</th><th>+/-</th>
+        </tr>
+      </thead>
+      <tbody id="logBody"></tbody>
+    </table>
+  </div>
+
+  <div class="footer">Generálva: 2026-11-21</div>
+</div>
+
+<script>
+const GAMES = [{date:"2026-09-12",opp:"CEKK",wl:"GY +19",result:"W",mins:1.5000,pts:0,reb:0,ast:0,stl:0,to_:0,blk:0,fgm:0,fga:0,fg3m:0,fg3a:0,ftm:0,fta:0,eff:0,pir:0,pm:-1,usg:"0%"},
+  {date:"2026-09-12",opp:"Szolnoki sportcentrum",wl:"V -48",result:"L",mins:22.7333,pts:6,reb:4,ast:0,stl:3,to_:3,blk:1,fgm:2,fga:5,fg3m:0,fg3a:0,ftm:2,fta:6,eff:4,pir:7,pm:-33,usg:"70%"},
+  {date:"2026-10-20",opp:"Kiss Lenke/B",wl:"V -22",result:"L",mins:8.6833,pts:5,reb:3,ast:0,stl:0,to_:0,blk:1,fgm:2,fga:3,fg3m:0,fg3a:0,ftm:1,fta:2,eff:7,pir:7,pm:-7,usg:"19%"},
+  {date:"2026-11-08",opp:"Mezőberényi KK",wl:"V -11",result:"L",mins:2.5000,pts:2,reb:0,ast:0,stl:0,to_:1,blk:0,fgm:1,fga:1,fg3m:0,fg3a:0,ftm:0,fta:0,eff:1,pir:1,pm:-5,usg:"40%"},
+  {date:"2026-11-10",opp:"Fót",wl:"V -4",result:"L",mins:17.7833,pts:13,reb:3,ast:0,stl:2,to_:3,blk:0,fgm:4,fga:10,fg3m:0,fg3a:0,ftm:5,fta:12,eff:2,pir:6,pm:3,usg:"148%"},
+  {date:"2026-11-14",opp:"BKG V",wl:"V -42",result:"L",mins:11.2667,pts:2,reb:1,ast:1,stl:3,to_:2,blk:1,fgm:1,fga:5,fg3m:0,fg3a:0,ftm:0,fta:0,eff:2,pir:2,pm:-10,usg:"49%"}];
+
+function fmt1(v) { return v.toFixed(1); }
+function avg(arr) { return arr.length ? arr.reduce((a,b)=>a+b,0)/arr.length : 0; }
+function sum(arr) { return arr.reduce((a,b)=>a+b,0); }
+
+(function() {
+  const n = GAMES.length;
+  if (!n) return;
+
+  // KPIs
+  const ppg = avg(GAMES.map(g=>g.pts));
+  const rpg = avg(GAMES.map(g=>g.reb));
+  const apg = avg(GAMES.map(g=>g.ast));
+  const totalFgm = sum(GAMES.map(g=>g.fgm));
+  const totalFga = sum(GAMES.map(g=>g.fga));
+  const fgPct = totalFga > 0 ? (totalFgm/totalFga*100) : null;
+  const pirg = avg(GAMES.map(g=>g.pir));
+  const mpg = avg(GAMES.map(g=>g.mins));
+
+  document.getElementById('kpiPpg').textContent = fmt1(ppg);
+  document.getElementById('kpiRpg').textContent = fmt1(rpg);
+  document.getElementById('kpiApg').textContent = fmt1(apg);
+  document.getElementById('kpiFg').textContent  = fgPct !== null ? fmt1(fgPct)+'%' : '—';
+  document.getElementById('kpiPir').textContent = fmt1(pirg);
+  document.getElementById('hdrSub').textContent = n + ' mérkőzés · átl. ' + fmt1(mpg) + ' mpg';
+
+  // Chart
+  const pts = GAMES.map(g=>g.pts);
+  const maxPts = Math.max(...pts, 1);
+  const minPts = Math.min(...pts, 0);
+  const range = maxPts - minPts || 1;
+
+  const svg = document.getElementById('ptsChart');
+  const W = svg.clientWidth || 700;
+  const H = 160;
+  const PAD_L = 32, PAD_R = 12, PAD_T = 14, PAD_B = 24;
+  const chartW = W - PAD_L - PAD_R;
+  const chartH = H - PAD_T - PAD_B;
+
+  function xPos(i) {
+    return PAD_L + (n===1 ? chartW/2 : i/(n-1)*chartW);
+  }
+  function yPos(v) {
+    return PAD_T + chartH - ((v - minPts)/range)*chartH;
+  }
+
+  // Grid lines
+  const nTicks = 3;
+  for (let i=0; i<=nTicks; i++) {
+    const val = minPts + Math.round((range/nTicks)*i);
+    const y = yPos(val);
+    const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+    line.setAttribute('x1', PAD_L); line.setAttribute('x2', PAD_L+chartW);
+    line.setAttribute('y1', y); line.setAttribute('y2', y);
+    line.setAttribute('stroke','#c3c2b7'); line.setAttribute('stroke-width','0.6');
+    line.setAttribute('stroke-dasharray','3,3');
+    svg.appendChild(line);
+    const lbl = document.createElementNS('http://www.w3.org/2000/svg','text');
+    lbl.setAttribute('x', PAD_L-4); lbl.setAttribute('y', y+4);
+    lbl.setAttribute('text-anchor','end'); lbl.setAttribute('font-size','10');
+    lbl.setAttribute('fill','#898781');
+    lbl.textContent = val;
+    svg.appendChild(lbl);
+  }
+
+  // Line
+  if (n > 1) {
+    const pts_arr = GAMES.map((g,i)=>xPos(i)+','+yPos(g.pts)).join(' ');
+    const poly = document.createElementNS('http://www.w3.org/2000/svg','polyline');
+    poly.setAttribute('points', pts_arr);
+    poly.setAttribute('fill','none');
+    poly.setAttribute('stroke','#c3c2b7');
+    poly.setAttribute('stroke-width','2');
+    svg.appendChild(poly);
+  }
+
+  // Dots
+  const tip = document.getElementById('tip');
+  GAMES.forEach((g,i) => {
+    const x = xPos(i), y = yPos(g.pts);
+    const color = g.result==='W' ? '#2a78d6' : '#eb6834';
+
+    // White ring
+    const ring = document.createElementNS('http://www.w3.org/2000/svg','circle');
+    ring.setAttribute('cx',x); ring.setAttribute('cy',y);
+    ring.setAttribute('r',7); ring.setAttribute('fill','white');
+    svg.appendChild(ring);
+
+    const dot = document.createElementNS('http://www.w3.org/2000/svg','circle');
+    dot.setAttribute('cx',x); dot.setAttribute('cy',y);
+    dot.setAttribute('r',5); dot.setAttribute('fill',color);
+    dot.setAttribute('cursor','pointer');
+    dot.addEventListener('mouseover', function(e) {
+      tip.textContent = 'Mérkőzés '+(i+1)+': vs '+g.opp+' · '+g.pts+' pont';
+      tip.style.opacity='1';
+    });
+    dot.addEventListener('mousemove', function(e) {
+      const rect = svg.getBoundingClientRect();
+      tip.style.left = (e.clientX - rect.left + 10) + 'px';
+      tip.style.top  = (e.clientY - rect.top  - 28) + 'px';
+    });
+    dot.addEventListener('mouseout', function() {
+      tip.style.opacity='0';
+    });
+    svg.appendChild(dot);
+
+    // X-axis label
+    const xl = document.createElementNS('http://www.w3.org/2000/svg','text');
+    xl.setAttribute('x', x); xl.setAttribute('y', H-4);
+    xl.setAttribute('text-anchor','middle'); xl.setAttribute('font-size','10');
+    xl.setAttribute('fill','#898781');
+    xl.textContent = i+1;
+    svg.appendChild(xl);
+  });
+
+  // Log table
+  const tbody = document.getElementById('logBody');
+  GAMES.forEach(function(g) {
+    const fgPctRow = g.fga > 0 ? Math.round(g.fgm/g.fga*100)+'%' : '—';
+    const pmStr = g.pm > 0 ? '+'+g.pm : (g.pm === 0 ? '0' : String(g.pm));
+    const dateShort = g.date.slice(5).replace('-','.');  // MM.DD.
+    const isWin = g.result === 'W';
+    const tr = document.createElement('tr');
+    tr.innerHTML =
+      '<td class="'+(isWin?'border-w':'border-l')+'">'+dateShort+'</td>'+
+      '<td>'+g.opp+'</td>'+
+      '<td class="'+(isWin?'gy':'ve')+'">'+(isWin?'GY':'V')+'</td>'+
+      '<td>'+g.mins.toFixed(1)+'</td>'+
+      '<td>'+g.pts+'</td>'+
+      '<td>'+g.reb+'</td>'+
+      '<td>'+g.ast+'</td>'+
+      '<td>'+fgPctRow+'</td>'+
+      '<td>'+g.pir+'</td>'+
+      '<td>'+pmStr+'</td>';
+    tbody.appendChild(tr);
+  });
+})();
+</script>
+</body>
+</html>
