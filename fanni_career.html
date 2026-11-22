@@ -262,7 +262,7 @@
       <table class="log-table">
         <thead><tr>
           <th>Ellenfél</th><th>Szint</th><th>Ered.</th>
-          <th>Perc</th><th>Pont</th><th>Lep.</th><th>GP</th>
+          <th>Perc</th><th>Pont</th><th>Lep.</th><th>GP</th><th>Szerezte</th>
           <th>FG%</th><th>PIR</th><th>+/-</th>
         </tr></thead>
         <tbody id="log-2627"></tbody>
@@ -273,7 +273,7 @@
       <table class="log-table">
         <thead><tr>
           <th>Ellenfél</th><th>Szint</th><th>Ered.</th>
-          <th>Perc</th><th>Pont</th><th>Lep.</th><th>GP</th>
+          <th>Perc</th><th>Pont</th><th>Lep.</th><th>GP</th><th>Szerezte</th>
           <th>FG%</th><th>PIR</th><th>+/-</th>
         </tr></thead>
         <tbody id="log-2526"></tbody>
@@ -385,7 +385,7 @@ function gameRow(g) {
   const pmClass=g.pm>0?'pm-pos':(g.pm<0?'pm-neg':'');
   const mins=g.mins?(Math.floor(g.mins)+':'+(Math.round((g.mins%1)*60)).toString().padStart(2,'0')):'—';
   const fgStr=(g.fgm!=null&&g.fga!=null&&g.fga>0)?(g.fgm/g.fga*100).toFixed(0)+'%':'—';
-  return `<tr><td>${g.opp}</td><td><span class="level-chip chip-${lc}">${g.level}</span></td><td class="${wlClass}">${g.wl}</td><td>${mins}</td><td>${g.pts??'—'}</td><td>${g.reb??'—'}</td><td>${g.ast??'—'}</td><td>${fgStr}</td><td>${g.pir??'—'}</td><td class="${pmClass}">${pmStr}</td></tr>`;
+  return `<tr><td>${g.opp}</td><td><span class="level-chip chip-${lc}">${g.level}</span></td><td class="${wlClass}">${g.wl}</td><td>${mins}</td><td>${g.pts??'—'}</td><td>${g.reb??'—'}</td><td>${g.ast??'—'}</td><td>${g.stl??'—'}</td><td>${fgStr}</td><td>${g.pir??'—'}</td><td class="${pmClass}">${pmStr}</td></tr>`;
 }
 
 function buildLog() {
