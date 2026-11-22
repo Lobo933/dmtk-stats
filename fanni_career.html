@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fanni #23 — Karrierstatisztika</title>
+<style>
+  :root {
+    color-scheme: light;
+    --surface-1:      #fcfcfb;
+    --surface-2:      #f9f9f7;
+    --surface-3:      #f0efec;
+    --text-primary:   #0b0b0b;
+    --text-secondary: #52514e;
+    --text-muted:     #898781;
+    --grid:           #e1e0d9;
+    --baseline:       #c3c2b7;
+    --border:         rgba(11,11,11,0.10);
+    --series-u1415:   #eda100;
+    --series-u16:     #2a78d6;
+    --series-u18:     #eb6834;
+    --good:           #006300;
+    --bad:            #c0392b;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) {
+      color-scheme: dark;
+      --surface-1:      #1a1a19;
+      --surface-2:      #0d0d0d;
+      --surface-3:      #2c2c2a;
+      --text-primary:   #f0efec;
+      --text-secondary: #c3c2b7;
+      --text-muted:     #898781;
+      --grid:           #2c2c2a;
+      --baseline:       #383835;
+      --border:         rgba(255,255,255,0.10);
+      --series-u1415:   #c98500;
+      --series-u16:     #3987e5;
+      --series-u18:     #d95926;
+      --good:           #0ca30c;
+      --bad:            #e66767;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --surface-1:      #1a1a19;
+    --surface-2:      #0d0d0d;
+    --surface-3:      #2c2c2a;
+    --text-primary:   #f0efec;
+    --text-secondary: #c3c2b7;
+    --text-muted:     #898781;
+    --grid:           #2c2c2a;
+    --baseline:       #383835;
+    --border:         rgba(255,255,255,0.10);
+    --series-u1415:   #c98500;
+    --series-u16:     #3987e5;
+    --series-u18:     #d95926;
+    --good:           #0ca30c;
+    --bad:            #e66767;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    background: var(--surface-2);
+    color: var(--text-primary);
+    font-size: 14px;
+    line-height: 1.5;
+    padding: 24px 16px 48px;
+  }
+  .page { max-width: 900px; margin: 0 auto; }
+  .hero {
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px 28px 20px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: flex-start;
+    gap: 24px;
+  }
+  .hero-badge {
+    width: 56px; height: 56px; border-radius: 50%;
+    background: var(--series-u16);
+    color: #fff;
+    font-size: 22px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .hero-info h1 { font-size: 26px; font-weight: 700; letter-spacing: -0.3px; }
+  .hero-info .subtitle { color: var(--text-secondary); font-size: 13px; margin-top: 2px; }
+  .hero-right { margin-left: auto; text-align: right; }
+  .theme-toggle {
+    background: none; border: 1px solid var(--border); border-radius: 6px;
+    padding: 5px 10px; cursor: pointer; font-size: 12px;
+    color: var(--text-secondary); font-family: inherit;
+  }
+  .theme-toggle:hover { background: var(--surface-3); }
+  .kpi-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .kpi {
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px 12px;
+  }
+  .kpi-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+  .kpi-value { font-size: 28px; font-weight: 700; line-height: 1.1; margin: 2px 0 1px; }
+  .kpi-sub { font-size: 12px; color: var(--text-secondary); }
+  .kpi-avg { font-size: 12px; color: var(--text-muted); border-top: 1px solid var(--grid); margin-top: 8px; padding-top: 6px; }
+  .card {
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px 20px 16px;
+    margin-bottom: 16px;
+  }
+  .card-title {
+    font-size: 12px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.08em; color: var(--text-muted);
+    margin-bottom: 16px;
+  }
+  .legend { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 12px; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-secondary); }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .chart-wrap { position: relative; width: 100%; }
+  svg text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+  .tooltip {
+    position: fixed; pointer-events: none;
+    background: var(--surface-1); border: 1px solid var(--border);
+    border-radius: 8px; padding: 10px 12px;
+    font-size: 12px; line-height: 1.6;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+    z-index: 100; display: none;
+    max-width: 220px;
+  }
+  .tooltip strong { font-size: 13px; display: block; margin-bottom: 2px; }
+  .season-table { width: 100%; border-collapse: collapse; }
+  .season-table th {
+    font-size: 11px; color: var(--text-muted); font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.05em;
+    text-align: right; padding: 0 8px 8px; white-space: nowrap;
+  }
+  .season-table th:first-child { text-align: left; }
+  .season-table td {
+    text-align: right; padding: 6px 8px;
+    font-variant-numeric: tabular-nums; font-size: 13px;
+    border-top: 1px solid var(--grid);
+  }
+  .season-table td:first-child { text-align: left; font-weight: 600; }
+  .season-table .bar-cell { width: 120px; padding-right: 0; }
+  .bar-track { height: 8px; background: var(--grid); border-radius: 4px; overflow: visible; position: relative; }
+  .bar-fill { height: 100%; border-radius: 4px 0 0 4px; transition: width 0.4s ease; }
+  .bar-fill.rounded { border-radius: 4px; }
+  .level-chip {
+    display: inline-block; font-size: 10px; font-weight: 700;
+    padding: 2px 6px; border-radius: 4px; color: #fff;
+    vertical-align: middle; margin-left: 4px;
+  }
+  .chip-u1415 { background: var(--series-u1415); color: #0b0b0b; }
+  .chip-u16 { background: var(--series-u16); }
+  .chip-u18 { background: var(--series-u18); }
+  .log-table { width: 100%; border-collapse: collapse; }
+  .log-table th {
+    font-size: 11px; color: var(--text-muted); font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.05em;
+    text-align: right; padding: 0 6px 8px; white-space: nowrap;
+  }
+  .log-table th:first-child, .log-table th:nth-child(2), .log-table th:nth-child(3) { text-align: left; }
+  .log-table td {
+    font-size: 12px; padding: 5px 6px;
+    text-align: right; border-top: 1px solid var(--grid);
+    font-variant-numeric: tabular-nums;
+  }
+  .log-table td:first-child, .log-table td:nth-child(2), .log-table td:nth-child(3) { text-align: left; }
+  .log-table tr:hover td { background: var(--surface-2); }
+  .pm-pos { color: var(--good); font-weight: 600; }
+  .pm-neg { color: var(--bad); }
+  .collapse-btn {
+    background: none; border: 1px solid var(--border); border-radius: 6px;
+    padding: 6px 12px; cursor: pointer; font-size: 12px;
+    color: var(--text-secondary); font-family: inherit; margin-top: 10px;
+    display: block; width: 100%;
+  }
+  .collapse-btn:hover { background: var(--surface-2); }
+  .hidden { display: none; }
+  .table-view-btn {
+    font-size: 11px; color: var(--text-muted); border: none;
+    background: none; cursor: pointer; font-family: inherit;
+    text-decoration: underline; padding: 0; float: right; margin-top: 2px;
+  }
+  .note { font-size: 11px; color: var(--text-muted); margin-top: 10px; }
+
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="hero">
+    <div class="hero-badge">#23</div>
+    <div class="hero-info">
+      <h1>Fanni</h1>
+      <div class="subtitle">DMTK · 2012 · Pivot / Erőcsatár · 2025–26 → 2026–27</div>
+    </div>
+    <div class="hero-right">
+      <button class="theme-toggle" onclick="toggleTheme()">◐ Téma</button>
+    </div>
+  </div>
+
+  <div class="kpi-row">
+    <div class="kpi">
+      <div class="kpi-label">Meccsek</div>
+      <div class="kpi-value" id="kpi-gp">59</div>
+      <div class="kpi-sub">összes karriermérkőzés</div>
+      <div class="kpi-avg" id="kpi-gp-avg"></div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Pontok</div>
+      <div class="kpi-value" id="kpi-pts">—</div>
+      <div class="kpi-sub">összes karrierpont</div>
+      <div class="kpi-avg" id="kpi-pts-avg"></div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Lepattanók</div>
+      <div class="kpi-value" id="kpi-reb">—</div>
+      <div class="kpi-sub">összes karrierlepattanó</div>
+      <div class="kpi-avg" id="kpi-reb-avg"></div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Gólpasszok</div>
+      <div class="kpi-value" id="kpi-ast">—</div>
+      <div class="kpi-sub">összes karriergólpassz</div>
+      <div class="kpi-avg" id="kpi-ast-avg"></div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Legjobb PIR</div>
+      <div class="kpi-value" id="kpi-pir">—</div>
+      <div class="kpi-sub">egy mérkőzésen</div>
+      <div class="kpi-avg" id="kpi-pir-avg"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">
+      Pontok mérkőzésenként — karrieridővonal
+      <button class="table-view-btn" onclick="toggleTableView()">táblázatos nézet</button>
+    </div>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:var(--series-u1415)"></div>U1415 (2025–26)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--series-u16)"></div>U16 (2025–26 &amp; 2026–27)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--series-u18)"></div>U18 ↑ (2026–27)</div>
+    </div>
+    <div class="chart-wrap" id="timeline-wrap">
+      <svg id="timeline-svg" width="100%" style="display:block;overflow:visible;"></svg>
+    </div>
+    <div id="timeline-table" class="hidden" style="margin-top:8px;overflow-x:auto;"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Szezon-átlagok szintenként</div>
+    <div style="overflow-x:auto;">
+      <table class="season-table" id="season-table"></table>
+    </div>
+    <div class="note">PIR = teljesítményindex (statastic.info adatból minden szezonban). FG% = mezőnygól-százalék.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Mérkőzésnapló — 2026–27</div>
+    <div style="overflow-x:auto;">
+      <table class="log-table">
+        <thead>
+          <tr>
+            <th>Ellenfél</th><th>Szint</th><th>Ered.</th>
+            <th>Perc</th><th>Pont</th><th>Lep.</th><th>GP</th>
+            <th>FG%</th><th>PIR</th><th>+/-</th>
+          </tr>
+        </thead>
+        <tbody id="log-2627"></tbody>
+      </table>
+    </div>
+    <button class="collapse-btn" id="toggle-2526" onclick="toggle2526()">▼ 2025–26 meccsek megjelenítése (47 meccs)</button>
+    <div id="rows-2526" class="hidden" style="overflow-x:auto; margin-top:8px;">
+      <table class="log-table">
+        <thead>
+          <tr>
+            <th>Ellenfél</th><th>Szint</th><th>Ered.</th>
+            <th>Perc</th><th>Pont</th><th>Lep.</th><th>GP</th>
+            <th>FG%</th><th>PIR</th><th>+/-</th>
+          </tr>
+        </thead>
+        <tbody id="log-2526"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+<div class="tooltip" id="tooltip"></div>
+
+<script>
+const GAMES_2526 = [{"season": "2025-26", "level": "U1415", "date": "2025-09-27", "opp": "?", "wl": "V -57", "mins": 40.0, "pts": 4, "reb": null, "ast": null, "stl": null, "blk": null, "to_": null, "fgm": null, "fga": 5, "fg3m": 0, "fg3a": 0, "ftm": 4, "fta": 8, "eff": -5, "pir": null, "pm": null}, {"season": "2025-26", "level": "U1415", "date": "2025-09-27", "opp": "?", "wl": "GY +4", "mins": 40.0, "pts": 3, "reb": null, "ast": null, "stl": null, "blk": null, "to_": null, "fgm": null, "fga": 9, "fg3m": 0, "fg3a": 0, "ftm": 3, "fta": 5, "eff": -8, "pir": null, "pm": null}, {"season": "2025-26", "level": "U1415", "date": "2025-10-12", "opp": "?", "wl": "GY +1", "mins": 40.0, "pts": 7, "reb": null, "ast": null, "stl": null, "blk": null, "to_": null, "fgm": null, "fga": 9, "fg3m": 0, "fg3a": 0, "ftm": 7, "fta": 8, "eff": -3, "pir": null, "pm": null}, {"season": "2025-26", "level": "U1415", "date": "2025-10-12", "opp": "?", "wl": "GY +54", "mins": null, "pts": 1, "reb": null, "ast": null, "stl": null, "blk": null, "to_": null, "fgm": null, "fga": 5, "fg3m": 0, "fg3a": 0, "ftm": 1, "fta": 2, "eff": -5, "pir": null, "pm": null}, {"season": "2025-26", "level": "U16", "date": "2025-10-14", "opp": "?", "wl": "GY +82", "mins": 5.6, "pts": 0, "reb": null, "ast": 1, "stl": 1, "blk": null, "to_": null, "fgm": null, "fga": 2, "fg3m": 0, "fg3a": 0, "ftm": null, "fta": null, "eff": 0, "pir": 3, "pm": 8}, {"season": "2025-26", "level": "U1415", "date": "2025-10-18", "opp": "?", "wl": "V -96", "mins": 15.6, "pts": 0, "reb": null, "ast": null, "stl": 2, "blk": null, "to_": 1, "fgm": null, "fga": 3, "fg3m": 0, "fg3a": 0, "ftm": null, "fta": null, "eff": -2, "pir": null, "pm": null}, {"season": "2025-26", "level": "U1415", "date": "2025-10-18", "opp": "?", "wl": "GY +19", "mins": 30.0, "pts": 5, "reb": null, "ast": 4, "stl": 3, "blk": 2, "to_": 2, "fgm": null, "fga": 18, "fg3m": 0, "fg3a": 0, "ftm": 5, "fta": 6, "eff": -7, "pir": null, "pm": null}, {"season": "2025-26", "level": "U1415", "date": "2025-11-12", "opp": "?", "wl": "GY +15", "mins": 40.0, "pts": 6, "reb": null, "ast": null, "stl": null, "blk": null, "to_": null, "fgm": null, "fga": 7, "fg3m": 0, "fg3a": 0, "ftm": 6, "fta": 12, "eff": -7, "pir": null, "pm": null}, {"season": "2025-26", "level": "U1415", "date": "2025-11-15", "opp": "?", "wl": "V -24", "mins": 21.5, "pts": 2, "reb": null, "ast": 1, "stl": 1, "blk": 1, "to_": 1, "fgm": null, "fga": 4, "fg3m": 0, "fg3a": 0, "ftm": 2, "fta": 8, "eff": -6, "pir": null, "pm": null}, {"season": "2025-26", "level": "U1415", "date": "2025-11-15", "opp": "?", "wl": "V -3", "mins": 25.8, "pts": 3, "reb": null, "ast": 2, "stl": 5, "blk": null, "to_": 4, "fgm": null, "fga": 12, "fg3m": 0, "fg3a": 0, "ftm": 3, "fta": 8, "eff": -11, "pir": null, "pm": null}, {"season": "2025-26", "level": "U16", "date": "2025-12-02", "opp": "?", "wl": "GY +31", "mins": 4.7, "pts": 0, "reb": null, "ast": null, "stl": 1, "blk": null, "to_": 1, "fgm": null, "fga": 2, "fg3m": 0, "fg3a": 0, "ftm": null, "fta": null, "eff": -2, "pir": 0, "pm": 4}, {"season": "2025-26", "level": "U1415", "date": "2025-12-07", "opp": "?", "wl": "V -59", "mins": 11.6, "pts": 0, "reb": null, "ast": null, "stl": 2, "blk": null, "to_": 2, "fgm": null, "fga": 5, "fg3m": 0, "fg3a": 0, "ftm": null, "fta": null, "eff": -5, "pir": null, "pm": null}, {"season": "2025-26", "level": "U1415", "date": "2025-12-07", "opp": "?", "wl": "V -50", "mins": 26.9, "pts": 3, "reb": null, "ast": null, "stl": 6, "blk": null, "to_": 7, "fgm": null, "fga": 8, "fg3m": 0, "fg3a": 0, "ftm": 3, "fta": 7, "eff": -10, "pir": null, "pm": null}, {"season": "2025-26", "level": "U1415", "date": "2026-01-17", "opp": "?", "wl": "V -7", "mins": 32.2, "pts": 3, "reb": null, "ast": 2, "stl": 7, "blk": null, "to_": 5, "fgm": null, "fga": 16, "fg3m": 0, "fg3a": 0, "ftm": 3, "fta": 11, "eff": -17, "pir": 20, "pm": -1}, {"season": "2025-26", "level": "U1415", "date": "2026-01-17", "opp": "?", "wl": "GY +22", "mins": 26.2, "pts": 4, "reb": null, "ast": 2, "stl": 4, "blk": 2, "to_": 2, "fgm": null, "fga": 11, "fg3m": 0, "fg3a": 0, "ftm": 4, "fta": 8, "eff": -5, "pir": 15, "pm": 14}, {"season": "2025-26", "level": "U16", "date": "2026-01-18", "opp": "?", "wl": "GY +49", "mins": 17.9, "pts": 1, "reb": null, "ast": null, "stl": 9, "blk": 1, "to_": null, "fgm": null, "fga": 8, "fg3m": 0, "fg3a": 0, "ftm": 1, "fta": 4, "eff": 0, "pir": 27, "pm": 20}, {"season": "2025-26", "level": "U16", "date": "2026-01-31", "opp": "?", "wl": "GY +8", "mins": 18.5, "pts": 2, "reb": null, "ast": 1, "stl": 4, "blk": null, "to_": null, "fgm": null, "fga": 4, "fg3m": 0, "fg3a": 0, "ftm": 2, "fta": 3, "eff": 2, "pir": 13, "pm": 4}, {"season": "2025-26", "level": "U1415", "date": "2026-02-01", "opp": "?", "wl": "V -3", "mins": 39.2, "pts": 1, "reb": null, "ast": 5, "stl": 9, "blk": 1, "to_": 10, "fgm": null, "fga": 19, "fg3m": 0, "fg3a": 0, "ftm": 1, "fta": 4, "eff": -16, "pir": 26, "pm": 0}, {"season": "2025-26", "level": "U16", "date": "2026-02-08", "opp": "?", "wl": "GY +27", "mins": 19.4, "pts": 1, "reb": null, "ast": null, "stl": 5, "blk": null, "to_": null, "fgm": null, "fga": 6, "fg3m": 0, "fg3a": 0, "ftm": 1, "fta": 2, "eff": -1, "pir": 14, "pm": 17}, {"season": "2025-26", "level": "U1415", "date": "2026-02-15", "opp": "?", "wl": "V -43", "mins": 30.1, "pts": 2, "reb": null, "ast": 1, "stl": 1, "blk": 1, "to_": 4, "fgm": null, "fga": 12, "fg3m": 0, "fg3a": 0, "ftm": 2, "fta": 8, "eff": -17, "pir": 3, "pm": -25}, {"season": "2025-26", "level": "U1415", "date": "2026-02-21", "opp": "?", "wl": "GY +9", "mins": 27.4, "pts": 2, "reb": null, "ast": 6, "stl": 10, "blk": 1, "to_": 1, "fgm": null, "fga": 11, "fg3m": 0, "fg3a": 0, "ftm": 2, "fta": 8, "eff": 1, "pir": null, "pm": null}, {"season": "2025-26", "level": "U1415", "date": "2026-02-21", "opp": "?", "wl": "GY +16", "mins": 25.9, "pts": 0, "reb": null, "ast": 3, "stl": 5, "blk": 1, "to_": 1, "fgm": null, "fga": 18, "fg3m": 0, "fg3a": 0, "ftm": null, "fta": null, "eff": -10, "pir": null, "pm": null}, {"season": "2025-26", "level": "U16", "date": "2026-02-24", "opp": "?", "wl": "V -35", "mins": 25.2, "pts": 0, "reb": null, "ast": 3, "stl": 3, "blk": null, "to_": 5, "fgm": null, "fga": 9, "fg3m": 0, "fg3a": 0, "ftm": null, "fta": 4, "eff": -12, "pir": 21, "pm": -19}, {"season": "2025-26", "level": "U1415", "date": "2026-02-28", "opp": "?", "wl": "V -51", "mins": 30.2, "pts": 4, "reb": null, "ast": null, "stl": 5, "blk": null, "to_": 3, "fgm": null, "fga": 7, "fg3m": 0, "fg3a": 0, "ftm": 4, "fta": 6, "eff": -3, "pir": 21, "pm": -33}, {"season": "2025-26", "level": "U1415", "date": "2026-03-07", "opp": "?", "wl": "GY +38", "mins": 26.2, "pts": 2, "reb": null, "ast": 1, "stl": 6, "blk": 2, "to_": 2, "fgm": null, "fga": 19, "fg3m": 0, "fg3a": 0, "ftm": 2, "fta": 5, "eff": -13, "pir": 21, "pm": 36}, {"season": "2025-26", "level": "U16", "date": "2026-03-10", "opp": "?", "wl": "V -17", "mins": 23.3, "pts": 0, "reb": null, "ast": null, "stl": null, "blk": null, "to_": null, "fgm": null, "fga": null, "fg3m": 0, "fg3a": 0, "ftm": null, "fta": null, "eff": null, "pir": 12, "pm": -1}, {"season": "2025-26", "level": "U1415", "date": "2026-03-11", "opp": "?", "wl": "V -61", "mins": null, "pts": 0, "reb": null, "ast": null, "stl": null, "blk": null, "to_": null, "fgm": null, "fga": 3, "fg3m": 0, "fg3a": 0, "ftm": null, "fta": null, "eff": -3, "pir": null, "pm": null}, {"season": "2025-26", "level": "U16", "date": "2026-03-14", "opp": "?", "wl": "GY +21", "mins": 22.0, "pts": 2, "reb": null, "ast": 2, "stl": 8, "blk": null, "to_": 3, "fgm": null, "fga": 8, "fg3m": 0, "fg3a": 0, "ftm": 2, "fta": 2, "eff": 1, "pir": 22, "pm": 21}, {"season": "2025-26", "level": "U16", "date": "2026-03-14", "opp": "?", "wl": "GY +30", "mins": 17.8, "pts": 1, "reb": null, "ast": 1, "stl": 6, "blk": null, "to_": 2, "fgm": null, "fga": 8, "fg3m": 0, "fg3a": 0, "ftm": 1, "fta": 2, "eff": -3, "pir": 11, "pm": 37}, {"season": "2025-26", "level": "U1415", "date": "2026-03-17", "opp": "?", "wl": "GY +55", "mins": 40.0, "pts": 1, "reb": null, "ast": null, "stl": null, "blk": null, "to_": null, "fgm": null, "fga": 10, "fg3m": 0, "fg3a": 0, "ftm": 1, "fta": 1, "eff": -9, "pir": null, "pm": null}, {"season": "2025-26", "level": "U1415", "date": "2026-03-21", "opp": "?", "wl": "GY +56", "mins": 18.5, "pts": 4, "reb": null, "ast": 5, "stl": 5, "blk": 1, "to_": 3, "fgm": null, "fga": 12, "fg3m": 0, "fg3a": 0, "ftm": 4, "fta": 4, "eff": 0, "pir": null, "pm": null}, {"season": "2025-26", "level": "U1415", "date": "2026-03-21", "opp": "?", "wl": "GY +26", "mins": 18.0, "pts": 1, "reb": null, "ast": 3, "stl": 7, "blk": 2, "to_": 3, "fgm": null, "fga": 13, "fg3m": 0, "fg3a": 0, "ftm": 1, "fta": 2, "eff": -4, "pir": null, "pm": null}, {"season": "2025-26", "level": "U1415", "date": "2026-03-24", "opp": "?", "wl": "GY +25", "mins": 29.4, "pts": 3, "reb": null, "ast": 4, "stl": 7, "blk": null, "to_": 4, "fgm": null, "fga": 13, "fg3m": 0, "fg3a": 0, "ftm": 3, "fta": 7, "eff": -7, "pir": 33, "pm": 30}, {"season": "2025-26", "level": "U16", "date": "2026-03-29", "opp": "?", "wl": "V -13", "mins": 25.2, "pts": 8, "reb": null, "ast": null, "stl": 5, "blk": null, "to_": 1, "fgm": null, "fga": 7, "fg3m": 0, "fg3a": 0, "ftm": 8, "fta": 9, "eff": 4, "pir": 25, "pm": -13}, {"season": "2025-26", "level": "U16", "date": "2026-04-14", "opp": "?", "wl": "V -6", "mins": 22.4, "pts": 0, "reb": null, "ast": null, "stl": 3, "blk": null, "to_": null, "fgm": null, "fga": 5, "fg3m": 0, "fg3a": 0, "ftm": null, "fta": null, "eff": -2, "pir": 3, "pm": 6}, {"season": "2025-26", "level": "U16", "date": "2026-04-16", "opp": "?", "wl": "V -46", "mins": 27.6, "pts": 3, "reb": null, "ast": null, "stl": 2, "blk": null, "to_": 3, "fgm": null, "fga": 6, "fg3m": 0, "fg3a": 0, "ftm": 3, "fta": 4, "eff": -5, "pir": 20, "pm": -32}, {"season": "2025-26", "level": "U1415", "date": "2026-04-18", "opp": "?", "wl": "V -58", "mins": 32.3, "pts": 0, "reb": null, "ast": null, "stl": 12, "blk": null, "to_": 7, "fgm": null, "fga": 11, "fg3m": 0, "fg3a": 0, "ftm": null, "fta": 3, "eff": -9, "pir": 17, "pm": -40}, {"season": "2025-26", "level": "U1415", "date": "2026-04-25", "opp": "?", "wl": "GY +44", "mins": 19.2, "pts": 2, "reb": null, "ast": 1, "stl": 6, "blk": null, "to_": 1, "fgm": null, "fga": 12, "fg3m": 0, "fg3a": 0, "ftm": 2, "fta": 2, "eff": -4, "pir": 28, "pm": 33}, {"season": "2025-26", "level": "U16", "date": "2026-04-25", "opp": "?", "wl": "GY +40", "mins": 19.6, "pts": 0, "reb": null, "ast": null, "stl": 7, "blk": null, "to_": 1, "fgm": null, "fga": 7, "fg3m": 0, "fg3a": 0, "ftm": null, "fta": null, "eff": -1, "pir": 17, "pm": 18}, {"season": "2025-26", "level": "U16", "date": "2026-04-25", "opp": "?", "wl": "GY +44", "mins": 17.5, "pts": 1, "reb": null, "ast": 1, "stl": 6, "blk": null, "to_": null, "fgm": null, "fga": 10, "fg3m": 0, "fg3a": 0, "ftm": 1, "fta": 2, "eff": -3, "pir": 28, "pm": 32}, {"season": "2025-26", "level": "U16", "date": "2026-04-28", "opp": "?", "wl": "GY +36", "mins": 17.8, "pts": 0, "reb": null, "ast": 3, "stl": 7, "blk": null, "to_": 6, "fgm": null, "fga": 3, "fg3m": 0, "fg3a": 0, "ftm": null, "fta": 1, "eff": 0, "pir": 6, "pm": 37}, {"season": "2025-26", "level": "U16", "date": "2026-05-05", "opp": "?", "wl": "GY +67", "mins": 14.2, "pts": 0, "reb": null, "ast": 5, "stl": 5, "blk": null, "to_": 1, "fgm": null, "fga": 4, "fg3m": 0, "fg3a": 0, "ftm": null, "fta": null, "eff": 5, "pir": 18, "pm": 26}, {"season": "2025-26", "level": "U1415", "date": "2026-05-10", "opp": "?", "wl": "GY +31", "mins": 19.2, "pts": 2, "reb": null, "ast": 2, "stl": 4, "blk": null, "to_": 2, "fgm": null, "fga": 7, "fg3m": 0, "fg3a": 0, "ftm": 2, "fta": 3, "eff": -2, "pir": null, "pm": null}, {"season": "2025-26", "level": "U1415", "date": "2026-05-10", "opp": "?", "wl": "GY +34", "mins": 21.9, "pts": 2, "reb": null, "ast": 3, "stl": 3, "blk": 1, "to_": 2, "fgm": null, "fga": 7, "fg3m": 0, "fg3a": 0, "ftm": 2, "fta": 4, "eff": -2, "pir": null, "pm": null}, {"season": "2025-26", "level": "U1415", "date": "2026-05-12", "opp": "?", "wl": "V -32", "mins": 26.4, "pts": 2, "reb": null, "ast": 4, "stl": 2, "blk": null, "to_": 3, "fgm": null, "fga": 11, "fg3m": 0, "fg3a": 0, "ftm": 2, "fta": 5, "eff": -9, "pir": 17, "pm": -3}, {"season": "2025-26", "level": "U16", "date": "2026-05-13", "opp": "?", "wl": "GY +32", "mins": 12.5, "pts": 0, "reb": null, "ast": 1, "stl": null, "blk": null, "to_": null, "fgm": null, "fga": 7, "fg3m": 0, "fg3a": 0, "ftm": null, "fta": null, "eff": -6, "pir": null, "pm": null}, {"season": "2025-26", "level": "U1415", "date": "2026-05-17", "opp": "?", "wl": "GY +24", "mins": 27.6, "pts": 6, "reb": null, "ast": 1, "stl": 6, "blk": 2, "to_": 5, "fgm": null, "fga": 9, "fg3m": 0, "fg3a": 0, "ftm": 6, "fta": 8, "eff": -1, "pir": 33, "pm": 27}];
+const GAMES_2627 = [{"season": "2026-27", "level": "U16", "date": "2026-09-12", "opp": "?", "wl": "GY +19", "mins": 36.4, "pts": 0, "reb": null, "ast": 3, "stl": 4, "blk": 2, "to_": 5, "fgm": null, "fga": 14, "fg3m": 0, "fg3a": 0, "ftm": null, "fta": 4, "eff": -14, "pir": 35, "pm": 26}, {"season": "2026-27", "level": "U16", "date": "2026-09-12", "opp": "?", "wl": "V -48", "mins": 31.0, "pts": 1, "reb": null, "ast": null, "stl": 4, "blk": 2, "to_": 4, "fgm": null, "fga": 6, "fg3m": 0, "fg3a": 0, "ftm": 1, "fta": 8, "eff": -10, "pir": 19, "pm": -37}, {"season": "2026-27", "level": "U16", "date": "2026-10-06", "opp": "?", "wl": "GY +9", "mins": 32.9, "pts": 6, "reb": null, "ast": 1, "stl": 3, "blk": 3, "to_": 4, "fgm": null, "fga": 14, "fg3m": 0, "fg3a": 0, "ftm": 6, "fta": 9, "eff": -8, "pir": 28, "pm": 14}, {"season": "2026-27", "level": "U18", "date": "2026-10-18", "opp": "?", "wl": "V -17", "mins": 19.8, "pts": 0, "reb": null, "ast": null, "stl": 3, "blk": 1, "to_": 2, "fgm": null, "fga": 4, "fg3m": 0, "fg3a": 0, "ftm": null, "fta": null, "eff": -2, "pir": 6, "pm": -21}, {"season": "2026-27", "level": "U16", "date": "2026-10-20", "opp": "?", "wl": "V -20", "mins": 29.8, "pts": 2, "reb": null, "ast": 2, "stl": 6, "blk": null, "to_": 6, "fgm": null, "fga": 7, "fg3m": 0, "fg3a": 0, "ftm": 2, "fta": 8, "eff": -9, "pir": 19, "pm": -13}, {"season": "2026-27", "level": "U18", "date": "2026-10-21", "opp": "?", "wl": "V -30", "mins": 15.7, "pts": 1, "reb": null, "ast": 1, "stl": 1, "blk": null, "to_": 2, "fgm": null, "fga": 4, "fg3m": 0, "fg3a": 0, "ftm": 1, "fta": 1, "eff": -3, "pir": 9, "pm": -5}, {"season": "2026-27", "level": "U18", "date": "2026-11-07", "opp": "?", "wl": "GY +20", "mins": 18.2, "pts": 0, "reb": null, "ast": null, "stl": null, "blk": null, "to_": null, "fgm": null, "fga": 3, "fg3m": 0, "fg3a": 0, "ftm": null, "fta": 1, "eff": -4, "pir": 6, "pm": 18}, {"season": "2026-27", "level": "U16", "date": "2026-11-08", "opp": "?", "wl": "V -11", "mins": 37.6, "pts": 1, "reb": null, "ast": 4, "stl": 4, "blk": 1, "to_": 4, "fgm": null, "fga": 14, "fg3m": 0, "fg3a": 0, "ftm": 1, "fta": 2, "eff": -9, "pir": 19, "pm": -6}, {"season": "2026-27", "level": "U16", "date": "2026-11-10", "opp": "?", "wl": "V -4", "mins": 33.5, "pts": 0, "reb": null, "ast": 2, "stl": 3, "blk": 4, "to_": 2, "fgm": null, "fga": 7, "fg3m": 0, "fg3a": 0, "ftm": null, "fta": null, "eff": 0, "pir": 22, "pm": -3}, {"season": "2026-27", "level": "U16", "date": "2026-11-14", "opp": "?", "wl": "V -42", "mins": 35.1, "pts": 0, "reb": null, "ast": null, "stl": 4, "blk": 1, "to_": 5, "fgm": null, "fga": 13, "fg3m": 0, "fg3a": 0, "ftm": null, "fta": 1, "eff": -14, "pir": 22, "pm": -36}, {"season": "2026-27", "level": "U18", "date": "2026-11-21", "opp": "?", "wl": "GY +20", "mins": 13.5, "pts": 0, "reb": null, "ast": 2, "stl": null, "blk": null, "to_": null, "fgm": null, "fga": 4, "fg3m": 0, "fg3a": 0, "ftm": null, "fta": null, "eff": -2, "pir": 4, "pm": -2}, {"season": "2026-27", "level": "U16", "date": "2026-11-22", "opp": "?", "wl": "GY +13", "mins": 38.1, "pts": 3, "reb": null, "ast": 4, "stl": 5, "blk": 2, "to_": 2, "fgm": null, "fga": 14, "fg3m": 0, "fg3a": 0, "ftm": 3, "fta": 3, "eff": -2, "pir": 27, "pm": 10}];
+
+const COLOR = { U1415:'var(--series-u1415)', U16:'var(--series-u16)', U18:'var(--series-u18)' };
+const HEX   = { U1415:'#eda100', U16:'#2a78d6', U18:'#eb6834' };
+
+function avg(arr) {
+  const v = arr.filter(x => x != null);
+  return v.length ? v.reduce((a,b)=>a+b,0)/v.length : null;
+}
+function sum(arr) {
+  const v = arr.filter(x => x != null);
+  return v.length ? v.reduce((a,b)=>a+b,0) : null;
+}
+function fmt1(v) { return v != null ? v.toFixed(1) : '—'; }
+
+const real2526 = GAMES_2526;
+const timelineGames = [...real2526, ...GAMES_2627];
+
+function buildKPI() {
+  const all = timelineGames;
+  const pts = sum(all.map(g=>g.pts));
+  const reb = sum(all.map(g=>g.reb));
+  const ast = sum(all.map(g=>g.ast));
+  const allPirs = all.map(g=>g.pir).filter(x=>x!=null);
+  const bestPir = allPirs.length ? Math.max(...allPirs) : null;
+  const avgPir = avg(allPirs);
+  document.getElementById('kpi-gp').textContent = all.length;
+  document.getElementById('kpi-pts').textContent = pts ?? '—';
+  document.getElementById('kpi-pts-avg').textContent = `átlag: ${fmt1(avg(all.map(g=>g.pts)))} meccsenként`;
+  document.getElementById('kpi-reb').textContent = reb ?? '—';
+  document.getElementById('kpi-reb-avg').textContent = `átlag: ${fmt1(avg(all.map(g=>g.reb)))} meccsenként`;
+  document.getElementById('kpi-ast').textContent = ast ?? '—';
+  document.getElementById('kpi-ast-avg').textContent = `átlag: ${fmt1(avg(all.map(g=>g.ast)))} meccsenként`;
+  document.getElementById('kpi-pir').textContent = bestPir ?? '—';
+  document.getElementById('kpi-pir-avg').textContent = `átlag: ${fmt1(avgPir)} (összes szezon)`;
+}
+
+function buildTimeline() {
+  const wrap = document.getElementById('timeline-wrap');
+  const W = wrap.getBoundingClientRect().width || 820;
+  const PAD = { t:12, r:16, b:28, l:30 };
+  const H = 180;
+  const inner_w = W - PAD.l - PAD.r;
+  const inner_h = H - PAD.t - PAD.b;
+  const data = timelineGames;
+  const maxPts = Math.max(...data.map(g=>g.pts||0));
+  const yMax = Math.ceil(maxPts/5)*5;
+  const n = data.length;
+  function xPos(i) { return PAD.l + (i/(n-1)) * inner_w; }
+  function yPos(v) { return PAD.t + inner_h - (v/yMax)*inner_h; }
+  let html = `<svg id="timeline-svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="Fanni pontjai meccsenként">`;
+  const yTicks = [0, Math.round(yMax*0.25), Math.round(yMax*0.5), Math.round(yMax*0.75), yMax];
+  for (const t of yTicks) {
+    const y = yPos(t);
+    html += `<line x1="${PAD.l}" y1="${y}" x2="${W-PAD.r}" y2="${y}" stroke="var(--grid)" stroke-width="1"/>`;
+    html += `<text x="${PAD.l-4}" y="${y+4}" text-anchor="end" font-size="10" fill="var(--text-muted)">${t}</text>`;
+  }
+  const divIdx = real2526.length - 1;
+  if (divIdx >= 0 && divIdx < n-1) {
+    const xDiv = (xPos(divIdx) + xPos(divIdx+1)) / 2;
+    html += `<line x1="${xDiv}" y1="${PAD.t}" x2="${xDiv}" y2="${PAD.t+inner_h}" stroke="var(--baseline)" stroke-width="1" stroke-dasharray="4 3"/>`;
+    html += `<text x="${xDiv-4}" y="${PAD.t+9}" text-anchor="end" font-size="10" fill="var(--text-muted)">2025–26</text>`;
+    html += `<text x="${xDiv+4}" y="${PAD.t+9}" text-anchor="start" font-size="10" fill="var(--text-muted)">2026–27</text>`;
+  }
+  for (let i = 0; i < n; i++) {
+    const g = data[i];
+    if (g.pts == null) continue;
+    const x = xPos(i), y = yPos(g.pts);
+    const col = HEX[g.level] || '#888';
+    const dataStr = JSON.stringify({opp:g.opp,level:g.level,pts:g.pts,reb:g.reb,ast:g.ast,eff:g.eff,pir:g.pir,pm:g.pm,wl:g.wl}).replace(/"/g,'&quot;');
+    html += `<circle cx="${x}" cy="${y}" r="5" fill="${col}" stroke="var(--surface-1)" stroke-width="2"/>`;
+    html += `<circle cx="${x}" cy="${y}" r="10" fill="transparent" class="dot-hit" data-info="${dataStr}" style="cursor:pointer"/>`;
+  }
+  html += '</svg>';
+  wrap.innerHTML = html;
+  wrap.querySelectorAll('.dot-hit').forEach(el => {
+    el.addEventListener('mouseenter', e => {
+      const d = JSON.parse(e.target.dataset.info);
+      const tt = document.getElementById('tooltip');
+      tt.innerHTML = `<strong>${d.opp}</strong>
+        <span class="level-chip chip-${d.level.toLowerCase().replace(/[^a-z0-9]/g,'')}">${d.level}</span><br>
+        ${d.wl}<br>
+        Pont: <b>${d.pts}</b> · Lep: ${d.reb??'—'} · GP: ${d.ast??'—'}<br>
+        PIR: ${d.pir??'—'}<br>
+        +/-: ${d.pm!=null?(d.pm>0?'+':'')+d.pm:'—'}`;
+      tt.style.display = 'block';
+    });
+    el.addEventListener('mousemove', e => {
+      const tt = document.getElementById('tooltip');
+      tt.style.left = (e.clientX+14)+'px';
+      tt.style.top  = (e.clientY-10)+'px';
+    });
+    el.addEventListener('mouseleave', () => {
+      document.getElementById('tooltip').style.display = 'none';
+    });
+  });
+}
+
+function buildSeasonTable() {
+  const seasons = [
+    { label:'U1415', season:'2025–26', games: real2526.filter(g=>g.level==='U1415') },
+    { label:'U16',   season:'2025–26', games: real2526.filter(g=>g.level==='U16') },
+    { label:'U16',   season:'2026–27', games: GAMES_2627.filter(g=>g.level==='U16') },
+    { label:'U18',   season:'2026–27', games: GAMES_2627.filter(g=>g.level==='U18') },
+  ];
+  const maxPts = Math.max(...seasons.map(s => avg(s.games.map(g=>g.pts))||0));
+  const maxReb = Math.max(...seasons.map(s => avg(s.games.map(g=>g.reb))||0));
+  let html = `<thead><tr>
+    <th>Szezon / Szint</th><th>M</th>
+    <th>PPM</th><th class="bar-cell"></th>
+    <th>Lep/M</th><th class="bar-cell"></th>
+    <th>GP/M</th><th>FG%</th><th>PIR/M</th>
+  </tr></thead><tbody>`;
+  for (const s of seasons) {
+    const g = s.games;
+    if (!g.length) continue;
+    const pts = avg(g.map(x=>x.pts));
+    const reb = avg(g.map(x=>x.reb));
+    const ast = avg(g.map(x=>x.ast));
+    const fgm = g.reduce((a,x)=>a+(x.fgm||0),0);
+    const fga = g.reduce((a,x)=>a+(x.fga||0),0);
+    const fgPct = fga>0 ? fgm/fga*100 : null;
+    const pir = avg(g.map(x=>x.pir).filter(x=>x!=null));
+    const lc = s.label.toLowerCase();
+    const ptsBar = pts ? (pts/maxPts*100).toFixed(1) : 0;
+    const rebBar = reb ? (reb/maxReb*100).toFixed(1) : 0;
+    const col = HEX[s.label] || '#888';
+    html += `<tr>
+      <td>${s.season} <span class="level-chip chip-${lc}">${s.label}</span></td>
+      <td>${g.length}</td>
+      <td>${fmt1(pts)}</td>
+      <td class="bar-cell"><div class="bar-track"><div class="bar-fill" style="width:${ptsBar}%;background:${col}"></div></div></td>
+      <td>${fmt1(reb)}</td>
+      <td class="bar-cell"><div class="bar-track"><div class="bar-fill" style="width:${rebBar}%;background:${col}"></div></div></td>
+      <td>${fmt1(ast)}</td>
+      <td>${fgPct!=null?fmt1(fgPct)+'%':'—'}</td>
+      <td>${pir!=null?fmt1(pir):'—'}</td>
+    </tr>`;
+  }
+  html += '</tbody>';
+  document.getElementById('season-table').innerHTML = html;
+}
+
+function gameRow(g) {
+  const lc = g.level.toLowerCase().replace(/[^a-z0-9]/g,'');
+  const wl = g.wl || '';
+  const wlClass = wl.startsWith('GY') ? 'pm-pos' : (wl.startsWith('V') ? 'pm-neg' : '');
+  const pmStr = g.pm != null ? (g.pm > 0 ? '+'+g.pm : ''+g.pm) : '—';
+  const pmClass = g.pm > 0 ? 'pm-pos' : (g.pm < 0 ? 'pm-neg' : '');
+  const mins = g.mins ? (Math.floor(g.mins)+':'+(Math.round((g.mins%1)*60)).toString().padStart(2,'0')) : '—';
+  const fgStr = (g.fgm != null && g.fga != null && g.fga > 0) ? (g.fgm/g.fga*100).toFixed(0)+'%' : '—';
+  return `<tr>
+    <td>${g.opp}</td>
+    <td><span class="level-chip chip-${lc}">${g.level}</span></td>
+    <td class="${wlClass}">${wl}</td>
+    <td>${mins}</td>
+    <td>${g.pts??'—'}</td>
+    <td>${g.reb??'—'}</td>
+    <td>${g.ast??'—'}</td>
+    <td>${fgStr}</td>
+    <td>${g.pir??'—'}</td>
+    <td class="${pmClass}">${pmStr}</td>
+  </tr>`;
+}
+
+function buildLog() {
+  document.getElementById('log-2627').innerHTML = GAMES_2627.map(gameRow).join('');
+  document.getElementById('log-2526').innerHTML = real2526.map(gameRow).join('');
+}
+
+let tableViewOn = false;
+function toggleTableView() {
+  tableViewOn = !tableViewOn;
+  document.getElementById('timeline-wrap').style.display = tableViewOn ? 'none' : '';
+  const tbl = document.getElementById('timeline-table');
+  if (tableViewOn) {
+    let h = '<table class="log-table"><thead><tr><th>#</th><th>Ellenfél</th><th>Szint</th><th>Pont</th><th>Lep.</th><th>GP</th><th>PIR</th></tr></thead><tbody>';
+    timelineGames.forEach((g,i) => {
+      h += `<tr><td>${i+1}</td><td>${g.opp}</td><td><span class="level-chip chip-${g.level.toLowerCase().replace(/[^a-z0-9]/g,'')}">${g.level}</span></td><td>${g.pts??'—'}</td><td>${g.reb??'—'}</td><td>${g.ast??'—'}</td><td>${g.pir??'—'}</td></tr>`;
+    });
+    h += '</tbody></table>';
+    tbl.innerHTML = h;
+    tbl.classList.remove('hidden');
+  } else {
+    tbl.classList.add('hidden');
+  }
+}
+
+let open2526 = false;
+function toggle2526() {
+  open2526 = !open2526;
+  document.getElementById('rows-2526').classList.toggle('hidden', !open2526);
+  const n = real2526.length;
+  document.getElementById('toggle-2526').textContent = open2526
+    ? '▲ 2025–26 meccsek elrejtése'
+    : `▼ 2025–26 meccsek megjelenítése (${n} meccs)`;
+}
+
+function toggleTheme() {
+  const root = document.documentElement;
+  const cur = root.getAttribute('data-theme');
+  root.setAttribute('data-theme', cur === 'dark' ? 'light' : 'dark');
+  buildTimeline();
+}
+
+buildKPI();
+buildSeasonTable();
+buildLog();
+buildTimeline();
+window.addEventListener('resize', buildTimeline);
+
+</script>
+</body>
+</html>
