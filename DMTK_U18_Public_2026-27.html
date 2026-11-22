@@ -187,7 +187,7 @@ tr.game-clickable:hover td{background:#f5f8ff !important}
   </div>
   <div class="section" id="lineupsSection" style="display:none">
     <h2 data-i18n="lineups_title">Felállások</h2>
-    <p class="section-hint" data-i18n="lineups_hint">Top 20 felállás az eddigi szezonból, birtok szerint rendezve. Min. 5 birtok.</p>
+    <p class="section-hint" data-i18n="lineups_hint">Top 20 felállás az eddigi szezonból, labdabirtoklás szerint rendezve. Min. 5 labdabirtoklás.</p>
     <div class="table-scroll">
       <table id="lineupsTable">
         <thead><tr id="lineupsHead"></tr></thead>
@@ -225,7 +225,7 @@ const STANDINGS  = null;
 const LAST_GAME  = {"date": "11.21.", "opponent": "Parthus", "score": "65–45", "win": true};
 const LINEUPS    = [{"players": ["R. Míra", "Panna", "Zsani", "De. Zselyke", "Sára"], "possessions": 38, "pts_for": 36, "pts_allowed": 31, "seconds": 1140, "ortg": 94.7, "drtg": 81.6, "net_rating": 13.1}, {"players": ["Panna", "Zsani", "De. Zselyke", "Sára", "M. Míra"], "possessions": 38, "pts_for": 14, "pts_allowed": 30, "seconds": 1015, "ortg": 36.8, "drtg": 78.9, "net_rating": -42.1}, {"players": ["Panna", "Zsani", "Nóri", "De. Zselyke", "Sára"], "possessions": 37, "pts_for": 20, "pts_allowed": 23, "seconds": 875, "ortg": 54.1, "drtg": 62.2, "net_rating": -8.1}, {"players": ["Panna", "Fanni", "Zsani", "De. Zselyke", "Sára"], "possessions": 32, "pts_for": 19, "pts_allowed": 29, "seconds": 905, "ortg": 59.4, "drtg": 90.6, "net_rating": -31.2}, {"players": ["Panna", "Zsani", "Alíz", "De. Zselyke", "Sára"], "possessions": 23, "pts_for": 18, "pts_allowed": 17, "seconds": 645, "ortg": 78.3, "drtg": 73.9, "net_rating": 4.4}, {"players": ["R. Míra", "Panna", "Alíz", "De. Zselyke", "Sára"], "possessions": 23, "pts_for": 19, "pts_allowed": 8, "seconds": 705, "ortg": 82.6, "drtg": 34.8, "net_rating": 47.8}, {"players": ["Zsani", "Nóri", "De. Zselyke", "Sára", "M. Míra"], "possessions": 21, "pts_for": 5, "pts_allowed": 4, "seconds": 475, "ortg": 23.8, "drtg": 19.0, "net_rating": 4.8}, {"players": ["Panna", "Fanni", "De. Zselyke", "Sára", "M. Míra"], "possessions": 18, "pts_for": 15, "pts_allowed": 5, "seconds": 495, "ortg": 83.3, "drtg": 27.8, "net_rating": 55.5}, {"players": ["R. Míra", "Panna", "De. Zselyke", "Sára", "Nóri"], "possessions": 15, "pts_for": 11, "pts_allowed": 5, "seconds": 430, "ortg": 73.3, "drtg": 33.3, "net_rating": 40.0}, {"players": ["Panna", "Zsani", "Kati", "De. Zselyke", "Sára"], "possessions": 14, "pts_for": 8, "pts_allowed": 14, "seconds": 490, "ortg": 57.1, "drtg": 100.0, "net_rating": -42.9}, {"players": ["Zsani", "Adri", "Kati", "De. Zselyke", "Sára"], "possessions": 13, "pts_for": 9, "pts_allowed": 4, "seconds": 285, "ortg": 69.2, "drtg": 30.8, "net_rating": 38.4}, {"players": ["Panna", "Zsani", "Alíz", "Sára", "M. Míra"], "possessions": 12, "pts_for": 6, "pts_allowed": 0, "seconds": 260, "ortg": 50.0, "drtg": 0.0, "net_rating": 50.0}, {"players": ["Panna", "Alíz", "De. Zselyke", "Sára", "M. Míra"], "possessions": 11, "pts_for": 8, "pts_allowed": 7, "seconds": 390, "ortg": 72.7, "drtg": 63.6, "net_rating": 9.1}, {"players": ["R. Míra", "Panna", "Fanni", "Zsani", "De. Zselyke"], "possessions": 11, "pts_for": 14, "pts_allowed": 6, "seconds": 315, "ortg": 127.3, "drtg": 54.5, "net_rating": 72.8}, {"players": ["H. Míra", "Emili", "Nikol", "Kati", "M. Míra"], "possessions": 9, "pts_for": 3, "pts_allowed": 2, "seconds": 160, "ortg": 33.3, "drtg": 22.2, "net_rating": 11.1}, {"players": ["Nikol", "Adri", "Kati", "De. Zselyke", "M. Míra"], "possessions": 9, "pts_for": 2, "pts_allowed": 5, "seconds": 165, "ortg": 22.2, "drtg": 55.6, "net_rating": -33.4}, {"players": ["R. Míra", "Nikol", "Alíz", "Sára", "V. Bogi"], "possessions": 9, "pts_for": 0, "pts_allowed": 5, "seconds": 160, "ortg": 0.0, "drtg": 55.6, "net_rating": -55.6}, {"players": ["Panna", "Nikol", "Zsani", "De. Zselyke", "Sára"], "possessions": 8, "pts_for": 9, "pts_allowed": 5, "seconds": 170, "ortg": 112.5, "drtg": 62.5, "net_rating": 50.0}, {"players": ["Nikol", "Zsani", "Nóri", "De. Zselyke", "Sára"], "possessions": 8, "pts_for": 6, "pts_allowed": 4, "seconds": 185, "ortg": 75.0, "drtg": 50.0, "net_rating": 25.0}, {"players": ["R. Míra", "Fanni", "De. Zselyke", "Sára", "M. Míra"], "possessions": 8, "pts_for": 4, "pts_allowed": 10, "seconds": 330, "ortg": 50.0, "drtg": 125.0, "net_rating": -75.0}];
 const N_GAMES    = 7;
-const GENERATED  = "2026-11-22 19:01";
+const GENERATED  = "2026-11-22 19:07";
 const HAS_IMPACT = true;
 
 // ── i18n ─────────────────────────────────────────────────────────────────────
@@ -272,7 +272,7 @@ const T = {
     standings_note: "A CEKK és Szolnoki elleni mérkőzések selejtező mérkőzések voltak, nem számítanak a bajnoki tabellába.",
     standings_src: "Forrás: mkosz.hu",
     lineups_title: "Felállások",
-    lineups_hint: "Top 20 felállás az eddigi szezonból, birtok szerint rendezve. Min. 5 birtok.",
+    lineups_hint: "Top 20 felállás az eddigi szezonból, labdabirtoklás szerint rendezve. Min. 5 labdabirtoklás.",
     lineups_cols: ["Játékos 1","Játékos 2","Játékos 3","Játékos 4","Játékos 5","Labdabirtoklás","Pont","Ellen","ORtg","DRtg","Net"],
     last_game_label: "Legutóbbi meccs",
     next_game_label: "Következő mérkőzés",
