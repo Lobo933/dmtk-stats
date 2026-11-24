@@ -125,7 +125,7 @@ tr:nth-child(even) td{background:#f4f4f2}
 <body>
 <div class="card">
   <div class="hdr-title" id="hdrTitle">#23 Fanni · U18 · 2026–27</div>
-  <div class="hdr-sub" id="hdrSub">4 mérkőzés</div>
+  <div class="hdr-sub" id="hdrSub">5 mérkőzés</div>
 
   <div class="kpi-row" id="kpiRow">
     <div class="kpi"><div class="kpi-lbl">PPG</div><div class="kpi-val" id="kpiPpg">—</div></div>
@@ -158,14 +158,15 @@ tr:nth-child(even) td{background:#f4f4f2}
     </table>
   </div>
 
-  <div class="footer">Generálva: 2026-11-22</div>
+  <div class="footer">Generálva: 2026-11-24</div>
 </div>
 
 <script>
 const GAMES = [{date:"2026-10-18",opp:"Parthus",wl:"V -17",result:"L",mins:19.8167,pts:2,reb:7,ast:0,stl:3,to_:2,blk:1,fgm:1,fga:4,fg3m:0,fg3a:1,ftm:0,fta:0,eff:8,pir:6,pm:-21,usg:"50%"},
   {date:"2026-10-21",opp:"VESC",wl:"V -30",result:"L",mins:15.6833,pts:7,reb:6,ast:1,stl:1,to_:2,blk:0,fgm:3,fga:4,fg3m:0,fg3a:0,ftm:1,fta:1,eff:12,pir:9,pm:-5,usg:"49%"},
   {date:"2026-11-07",opp:"OSE Lions",wl:"GY +20",result:"W",mins:18.1833,pts:4,reb:8,ast:0,stl:0,to_:0,blk:0,fgm:2,fga:3,fg3m:0,fg3a:0,ftm:0,fta:1,eff:10,pir:6,pm:18,usg:"29%"},
-  {date:"2026-11-21",opp:"Parthus",wl:"GY +20",result:"W",mins:13.5000,pts:2,reb:3,ast:2,stl:0,to_:0,blk:0,fgm:1,fga:4,fg3m:0,fg3a:0,ftm:0,fta:0,eff:4,pir:4,pm:-2,usg:"24%"}];
+  {date:"2026-11-21",opp:"Parthus",wl:"GY +20",result:"W",mins:13.5000,pts:2,reb:3,ast:2,stl:0,to_:0,blk:0,fgm:1,fga:4,fg3m:0,fg3a:0,ftm:0,fta:0,eff:4,pir:4,pm:-2,usg:"24%"},
+  {date:"2026-11-24",opp:"VESC",wl:"GY +10",result:"W",mins:24.5833,pts:3,reb:11,ast:2,stl:0,to_:0,blk:0,fgm:1,fga:8,fg3m:0,fg3a:0,ftm:1,fta:2,eff:8,pir:6,pm:4,usg:"63%"}];
 
 function fmt1(v) { return v.toFixed(1); }
 function avg(arr) { return arr.length ? arr.reduce((a,b)=>a+b,0)/arr.length : 0; }

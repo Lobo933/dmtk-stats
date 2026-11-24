@@ -125,7 +125,7 @@ tr:nth-child(even) td{background:#f4f4f2}
 <body>
 <div class="card">
   <div class="hdr-title" id="hdrTitle">#18 Emili · U18 · 2026–27</div>
-  <div class="hdr-sub" id="hdrSub">4 mérkőzés</div>
+  <div class="hdr-sub" id="hdrSub">5 mérkőzés</div>
 
   <div class="kpi-row" id="kpiRow">
     <div class="kpi"><div class="kpi-lbl">PPG</div><div class="kpi-val" id="kpiPpg">—</div></div>
@@ -158,14 +158,15 @@ tr:nth-child(even) td{background:#f4f4f2}
     </table>
   </div>
 
-  <div class="footer">Generálva: 2026-11-22</div>
+  <div class="footer">Generálva: 2026-11-24</div>
 </div>
 
 <script>
 const GAMES = [{date:"2026-09-05",opp:"PVSK",wl:"V -45",result:"L",mins:6.0667,pts:0,reb:0,ast:0,stl:0,to_:1,blk:0,fgm:0,fga:0,fg3m:0,fg3a:0,ftm:0,fta:0,eff:-1,pir:-1,pm:-12,usg:"48%"},
   {date:"2026-09-05",opp:"Tatabánya",wl:"V -28",result:"L",mins:3.3500,pts:0,reb:0,ast:0,stl:0,to_:0,blk:0,fgm:0,fga:0,fg3m:0,fg3a:0,ftm:0,fta:0,eff:0,pir:0,pm:1,usg:"0%"},
   {date:"2026-10-09",opp:"OSE Lions",wl:"GY +12",result:"W",mins:1.4667,pts:0,reb:0,ast:0,stl:0,to_:2,blk:0,fgm:0,fga:0,fg3m:0,fg3a:0,ftm:0,fta:0,eff:-2,pir:-2,pm:-2,usg:"64%"},
-  {date:"2026-11-07",opp:"OSE Lions",wl:"GY +20",result:"W",mins:1.6167,pts:0,reb:0,ast:0,stl:0,to_:0,blk:0,fgm:0,fga:0,fg3m:0,fg3a:0,ftm:0,fta:0,eff:0,pir:0,pm:-2,usg:"0%"}];
+  {date:"2026-11-07",opp:"OSE Lions",wl:"GY +20",result:"W",mins:1.6167,pts:0,reb:0,ast:0,stl:0,to_:0,blk:0,fgm:0,fga:0,fg3m:0,fg3a:0,ftm:0,fta:0,eff:0,pir:0,pm:-2,usg:"0%"},
+  {date:"2026-11-24",opp:"VESC",wl:"GY +10",result:"W",mins:0.8333,pts:0,reb:2,ast:0,stl:0,to_:1,blk:0,fgm:0,fga:0,fg3m:0,fg3a:0,ftm:0,fta:0,eff:1,pir:1,pm:0,usg:"46%"}];
 
 function fmt1(v) { return v.toFixed(1); }
 function avg(arr) { return arr.length ? arr.reduce((a,b)=>a+b,0)/arr.length : 0; }
